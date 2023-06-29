@@ -2,7 +2,6 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
-
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -20,8 +19,13 @@ Route::get('/', function () {
 
 Route::match(['get','post'],'/login', [UserController::class,'login'])->name('login');
 Route::match(['get','post'],'/register', [UserController::class,'register'])->name('register');
+Route::match(['get','post'],'/forgot-password', [UserController::class,'forgotPassword'])->name('forgot-password');
+Route::get('/verify/{token}', [UserController::class,'verify'])->name('verify');
+Route::get('/reset-password/{token}', [UserController::class,'resetPassword'])->name('reset-password');
+Route::post('/reset-password', [UserController::class,'handleResetPassword'])->name('handle-reset-password');
+Route::get('logout', [UserController::class,'logout'])->name('logout');
 
-Route::prefix('admin')->middleware('auth')->group(function() {
+Route::prefix('admin')->middleware('checkUser')->group(function() {
     Route::get('/', function() {
         if (Auth::viaRemember())
         {

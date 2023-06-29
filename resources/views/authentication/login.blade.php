@@ -1,7 +1,13 @@
-@extends('layouts.authenticationLayout')
+@extends('layouts.auth')
 
 @section('title')
-    {{$title ?? 'Login'}}
+    {{$title}}
+@endsection
+
+@section('alert')
+    @if (session()->get('msg'))
+        <x-alert message="{{session()->get('msg')}}" type="{{session()->get('type')}}" />
+    @endif
 @endsection
 
 @section('content')
@@ -14,7 +20,7 @@
                 <label for="remember"><input type="checkbox" id="remember" name="remember" value="1"><span></span>Lưu mật khẩu</label>
             </div>
             <div class="action-item">
-                <a href="#">Quên mật khẩu?</a>
+                <a href="{{route('forgot-password')}}">Quên mật khẩu?</a>
             </div>
         </div>
         <div class="form-footer">

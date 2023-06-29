@@ -10,4 +10,7 @@
         </div>
         @endif
     </div>
+    @error($name)
+        <span class="form-input-error">{{$message}}</span>
+    @enderror
 </div>

@@ -12,13 +12,14 @@ class Check extends Component
      * @return void
      */
 
-    public $value,$name,$id,$label;
-    public function __construct($value='',$name,$id,$label)
+    public $value,$name,$id,$label,$checked;
+    public function __construct($value='',$name,$id,$label,$checked=false)
     {
         $this->value = $value;
         $this->name = $name;
         $this->id = $id;
         $this->label = $label;
+        $this->checked = $checked;
     }
 
     /**

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Http\Controllers\CacheController;
 use Auth;
 use Hash;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -13,7 +14,6 @@ use App\Models\PasswordReset;
 class User extends Authenticatable
 {
     use HasFactory, Notifiable;
-
     /**
      * The attributes that are mass assignable.
      *
@@ -47,6 +47,7 @@ class User extends Authenticatable
     protected $redirectTo = '/admin';
 
     public function login($username,$password,$remember=false) {
+        self::setCache('123','123123123');
         $usernameLogin = [
             'username' => $username,
             'password' => $password,
@@ -67,7 +68,7 @@ class User extends Authenticatable
         if($email && $email->email) {
             $email = $email->email;
             $password = Hash::make($password);
-            parent::where('email', $email)->update(['password' => $password]);
+            self::where('email', $email)->update(['password' => $password]);
             PasswordReset::where('email', $email)->update(['status' => 1]);
             return true;
         }

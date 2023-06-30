@@ -14,7 +14,7 @@ use App\Http\Controllers\UserController;
 */
 
 Route::get('/', function () {
-    return view('welcome');
+    return phpinfo();
 })->name('home');
 
 Route::match(['get','post'],'/login', [UserController::class,'login'])->name('login');

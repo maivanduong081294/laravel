@@ -7,7 +7,6 @@ use Hash;
 use Validator;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
-
 use App\Models\User;
 use App\Models\PasswordReset;
 use App\Http\Controllers\MailerController;

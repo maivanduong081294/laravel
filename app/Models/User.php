@@ -2,18 +2,27 @@
 
 namespace App\Models;
 
-use App\Http\Controllers\CacheController;
 use Auth;
 use Hash;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Auth\Authenticatable;
+use Illuminate\Auth\MustVerifyEmail;
+use Illuminate\Auth\Passwords\CanResetPassword;
+use Illuminate\Foundation\Auth\Access\Authorizable;
+use Illuminate\Contracts\Auth\Access\Authorizable as AuthorizableContract;
+use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
+use Illuminate\Contracts\Auth\CanResetPassword as CanResetPasswordContract;
 use Illuminate\Notifications\Notifiable;
 
 use App\Models\PasswordReset;
 
-class User extends Authenticatable
+class User extends BaseModel implements
+AuthenticatableContract,
+AuthorizableContract,
+CanResetPasswordContract
 {
     use HasFactory, Notifiable;
+    use Authenticatable, Authorizable, CanResetPassword, MustVerifyEmail;
     /**
      * The attributes that are mass assignable.
      *
@@ -47,7 +56,6 @@ class User extends Authenticatable
     protected $redirectTo = '/admin';
 
     public function login($username,$password,$remember=false) {
-        self::setCache('123','123123123');
         $usernameLogin = [
             'username' => $username,
             'password' => $password,
@@ -73,5 +81,13 @@ class User extends Authenticatable
             return true;
         }
         return false;
+    }
+
+    public function test() {
+        $item = self::getDetailByWhere(['username'=>'silver']);
+        //foreach($result as $item) {
+            echo $item->fullname.'<br>';
+            echo $item->username;
+        //}
     }
 }

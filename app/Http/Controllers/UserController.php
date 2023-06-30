@@ -10,6 +10,7 @@ use Illuminate\Support\Str;
 use App\Models\User;
 use App\Models\PasswordReset;
 use App\Http\Controllers\MailerController;
+use Illuminate\Support\Facades\Redis;
 
 class UserController extends Controller
 {
@@ -96,7 +97,8 @@ class UserController extends Controller
                 $createUser = User::create($data);
                 
                 if($createUser) {
-                    MailerController::send($data['email'],'Email Verification Mail','email.verificationEmail', ['token' => $token]);
+                    $mailer = new MailerController();
+                    $mailer->send($data['email'],'Email Verification Mail','email.verificationEmail', ['token' => $token]);
                 }
 
                 return redirect()->route('login')->with(['msg'=> 'Đăng ký thành công kiểm tra email để kích hoạt','type'=>'success']);
@@ -155,14 +157,21 @@ class UserController extends Controller
                     'created_at' => date('Y-m-d H:i:s')
                 );
 
-                $result = PasswordReset::create($data);
-
-                if($result) {
-                    MailerController::send($email,'Email Forgot Password Mail','email.forgotPasswordEmail', ['token' => $token]);
-                    return back()->withInput()->with(['msg'=> 'Kiểm tra email để đổi lại mật khẩu mới','type' => 'success']);
+                $check = PasswordReset::getDetailByWhere(['email' => $data['email'], 'status' => 0]);
+                //$check = PasswordReset::where('email',$data['email'])->where('status',0)->first();
+                if(!$check) {
+                    $result = PasswordReset::create($data);
+                    if($result) {
+                        $mailer = new MailerController();
+                        $mailer->send($email,'Email Forgot Password Mail','email.forgotPasswordEmail', ['token' => $token]);
+                        return back()->withInput()->with(['msg'=> 'Kiểm tra email để đổi lại mật khẩu mới','type' => 'success']);
+                    }
+                    else {
+                        return back()->withInput()->with('msg', 'Yêu cầu không hợp lệ');
+                    }
                 }
                 else {
-                    return back()->withInput()->with('msg', 'Yêu cầu không hợp lệ');
+                    return back()->withInput()->with(['msg'=> 'Kiểm tra email để đổi lại mật khẩu mới','type' => 'success']);
                 }
             }
         }
@@ -173,7 +182,7 @@ class UserController extends Controller
         $title = 'Đặt lại mật khẩu';
         $token = $request->token;
         if($token) {
-            $result = PasswordReset::where('token',$token)->first();
+            $result = PasswordReset::getDetailByWhere(['token' => $token]);
             if($result && $result->status == 0) {
                 $request->session()->flash('token', $token);
                 return view('authentication.resetPassword',compact('title'));
@@ -185,7 +194,7 @@ class UserController extends Controller
     public function handleResetPassword(Request $request) {
         $token = $request->session()->get('token');
         if($token) {
-            $result = PasswordReset::where('token',$token)->first();
+            $result = PasswordReset::getDetailByWhere(['token' => $token]);
             if($result && $result->status == 0) {
                 $password = $request->password;
                 $rules = [

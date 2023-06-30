@@ -16,6 +16,8 @@ class UserController extends Controller
 {
     //
     public function Login(Request $request) {
+        //flushCache();
+        User::test();
         $title = 'Đăng nhập';
         echo $request->msg;
         if($request->method() === "POST") {

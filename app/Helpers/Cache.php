@@ -43,6 +43,10 @@ function flushCache() {
     }
 }
 
+function hasTagsCache($tags,$key) {
+    return enabledCache() && Cache::tags($tags)->has($key);
+}
+
 function getTagsCache(Array $tags,$key) {
     if(enabledCache()) {
         $value = Cache::tags($tags)->get($key);

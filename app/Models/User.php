@@ -85,9 +85,9 @@ CanResetPasswordContract
 
     public function test() {
         $item = self::getDetailByWhere(['username'=>'silver']);
-        //foreach($result as $item) {
+        if($item) {
             echo $item->fullname.'<br>';
             echo $item->username;
-        //}
+        }
     }
 }

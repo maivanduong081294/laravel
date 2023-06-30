@@ -13,13 +13,26 @@ class BaseModel extends Model
         return with(new static)->getTable();
     }
 
-    public function getListByWhere($query,array $wheres) {
+    public function hasCache($key) {
+        return hasTagsCache([self::getTableName()],$key);
+    }
+    public function getCache($key) {
+        return getTagsCache([self::getTableName()],$key);
+    }
+
+    public function setCache($key,$value,$expire=null) {
+        return setTagsCache([self::getTableName()],$key,$value,$expire);
+    }
+
+    public function getListByWhere(array $wheres) {
         if(!empty($wheres)) {
-            $keyCache = self::getTableName();
-            $keyCache.= '-getListByWhere';
+            $keyCache = __FUNCTION__;
             $keyCache.= "-".json_encode($wheres);
-            $result = getCache($keyCache);
-            if(!$result) {
+            $value = self::getCache($keyCache);
+            if(self::hasCache($keyCache)) {
+                return $value;
+            }
+            else {
                 $query = self::select();
                 foreach($wheres as $key => $item) {
                     if(is_array($item)) {
@@ -33,20 +46,23 @@ class BaseModel extends Model
                     }
                 }
                 $result = $query->get();
-                setCache($keyCache,$result);
+                $value = $result?$result:'';
+                self::setCache($keyCache,$value);
             }
-            return $result;
+            return $value;
         }
         return [];
     }
 
     public function getDetailByWhere(array $wheres) {
         if(!empty($wheres)) {
-            $keyCache = self::getTableName();
-            $keyCache.= '-getDetailByWhere';
+            $keyCache = __FUNCTION__;
             $keyCache.= "-".json_encode($wheres);
-            $result = getCache($keyCache);
-            if(!$result) {
+            $value = self::getCache($keyCache);
+            if(self::hasCache($keyCache)) {
+                return $value;
+            }
+            else {
                 $query = self::select();
                 foreach($wheres as $key => $item) {
                     if(is_array($item)) {
@@ -60,9 +76,10 @@ class BaseModel extends Model
                     }
                 }
                 $result = $query->first();
-                setCache($keyCache,$result);
+                $value = $result?$result:'';
+                self::setCache($keyCache,$value);
             }
-            return $result;
+            return $value;
         }
         return [];
     }

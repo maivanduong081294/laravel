@@ -2,15 +2,12 @@
 
 namespace App\Models;
 
-
-use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Auth;
+use Hash;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Illuminate\Support\Str;
-use Mail; 
-use Auth;
-use Hash;
+
 use App\Models\PasswordReset;
 
 class User extends Authenticatable
@@ -49,21 +46,6 @@ class User extends Authenticatable
     
     protected $redirectTo = '/admin';
 
-    public function create($data) {
-        $token = Str::random(64);
-        $data['email_verified_token'] = $token;
-        $createUser = parent::create($data);
-        
-        if($createUser) {
-            Mail::send('email.verificationEmail', ['token' => $token], function($message) use($data){
-                $message->to($data['email']);
-                $message->subject('Email Verification Mail');
-            });
-        }
-
-        return $createUser;
-    }
-
     public function login($username,$password,$remember=false) {
         $usernameLogin = [
             'username' => $username,
@@ -78,26 +60,6 @@ class User extends Authenticatable
         } else {
             return false;
         }
-    }
-
-    public function forgotPassword($email) {
-        $token = Str::random(64);
-        $data = array(
-            'email' => $email,
-            'token' => $token,
-            'created_at' => date('Y-m-d H:i:s')
-        );
-
-        $result = PasswordReset::create($data);
-
-        if($result) {
-            Mail::send('email.forgotPasswordEmail', ['token' => $token], function($message) use($data){
-                $message->to($data['email']);
-                $message->subject('Email Forgot Password Mail');
-            });
-        }
-
-        return true;
     }
 
     public function resetPassword($token,$password) {

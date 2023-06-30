@@ -2,12 +2,15 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use Auth;
 use Hash;
 use Validator;
+use Illuminate\Http\Request;
+use Illuminate\Support\Str;
+
 use App\Models\User;
 use App\Models\PasswordReset;
+use App\Http\Controllers\MailerController;
 
 class UserController extends Controller
 {
@@ -83,13 +86,19 @@ class UserController extends Controller
                 return back()->withErrors($validator)->withInput()->with('msg', 'Đăng ký không thành công');
             }
             else {
+                $token = Str::random(64);
                 $data = [
                     'fullname' => $request->fullname,
                     'username' => $request->username,
                     'password' => Hash::make($request->password),
                     'email' => $request->email,
+                    'email_verified_token' => $token,
                 ];
                 $createUser = User::create($data);
+                
+                if($createUser) {
+                    MailerController::send($data['email'],'Email Verification Mail','email.verificationEmail', ['token' => $token]);
+                }
 
                 return redirect()->route('login')->with(['msg'=> 'Đăng ký thành công kiểm tra email để kích hoạt','type'=>'success']);
             }
@@ -139,8 +148,18 @@ class UserController extends Controller
                 return back()->withErrors($validator)->withInput()->with('msg', 'Yêu cầu không hợp lệ');
             }
             else {
-                $status = User::forgotPassword($request->email);
-                if($status) {
+                $token = Str::random(64);
+                $email = $request->email;
+                $data = array(
+                    'email' => $email,
+                    'token' => $token,
+                    'created_at' => date('Y-m-d H:i:s')
+                );
+
+                $result = PasswordReset::create($data);
+
+                if($result) {
+                    MailerController::send($email,'Email Forgot Password Mail','email.forgotPasswordEmail', ['token' => $token]);
                     return back()->withInput()->with(['msg'=> 'Kiểm tra email để đổi lại mật khẩu mới','type' => 'success']);
                 }
                 else {

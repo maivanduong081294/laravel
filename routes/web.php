@@ -27,14 +27,6 @@ Route::get('logout', [UserController::class,'logout'])->name('logout');
 
 Route::prefix('admin')->middleware('checkUser')->group(function() {
     Route::get('/', function() {
-        if (Auth::viaRemember())
-        {
-            echo "WOOOOOOOOOOOOOOOO";
-
-        }
-        else {
-            echo 'booooooo';
-        }
-        return 'dashboard';
+        return view('admin.general.dashboard');
     })->name('admin');
 });

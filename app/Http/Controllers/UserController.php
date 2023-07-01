@@ -16,8 +16,6 @@ class UserController extends Controller
 {
     //
     public function Login(Request $request) {
-        //flushCache();
-        User::test();
         $title = 'Đăng nhập';
         echo $request->msg;
         if($request->method() === "POST") {
@@ -160,10 +158,10 @@ class UserController extends Controller
                 );
 
                 $check = PasswordReset::getDetailByWhere(['email' => $data['email'], 'status' => 0]);
-                //$check = PasswordReset::where('email',$data['email'])->where('status',0)->first();
                 if(!$check) {
                     $result = PasswordReset::create($data);
                     if($result) {
+                        PasswordReset::flushCache();
                         $mailer = new MailerController();
                         $mailer->send($email,'Email Forgot Password Mail','email.forgotPasswordEmail', ['token' => $token]);
                         return back()->withInput()->with(['msg'=> 'Kiểm tra email để đổi lại mật khẩu mới','type' => 'success']);

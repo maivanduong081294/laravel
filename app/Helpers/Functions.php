@@ -5,6 +5,3 @@ function getFavicon() {
 function getLogo() {
     return asset('assets/logo.svg');
 }
-function test() {
-    return "1111";
-}

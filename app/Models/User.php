@@ -78,16 +78,15 @@ CanResetPasswordContract
             $password = Hash::make($password);
             self::where('email', $email)->update(['password' => $password]);
             PasswordReset::where('email', $email)->update(['status' => 1]);
+            PasswordReset::flushCache();
             return true;
         }
         return false;
     }
 
-    public function test() {
-        $item = self::getDetailByWhere(['username'=>'silver']);
-        if($item) {
-            echo $item->fullname.'<br>';
-            echo $item->username;
-        }
+    public function getCurrentUser() {
+        $user = Auth::user();
+        $user->avatar = asset('assets/admin/images/default-avatar.png');
+        return $user;
     }
 }

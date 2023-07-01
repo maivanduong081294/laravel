@@ -24,6 +24,10 @@ class BaseModel extends Model
         return setTagsCache([self::getTableName()],$key,$value,$expire);
     }
 
+    public function flushCache() {
+        return flushTagsCache(self::getTableName());
+    }
+
     public function getListByWhere(array $wheres) {
         if(!empty($wheres)) {
             $keyCache = __FUNCTION__;
@@ -60,9 +64,11 @@ class BaseModel extends Model
             $keyCache.= "-".json_encode($wheres);
             $value = self::getCache($keyCache);
             if(self::hasCache($keyCache)) {
+                echo 'cached';
                 return $value;
             }
             else {
+                echo 'non cached';
                 $query = self::select();
                 foreach($wheres as $key => $item) {
                     if(is_array($item)) {

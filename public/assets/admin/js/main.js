@@ -1,8 +1,8 @@
 function handleScreen() {
     let screen = $(this).width();
     if(screen >= 1170) {
-        if(!$("aside#sidebar").hasClass('show-sidebar')) {
-            $("aside#sidebar").addClass('show-sidebar');
+        if($("aside#sidebar").hasClass('show-sidebar')) {
+            $("aside#sidebar").removeClass('show-sidebar');
         }
     }
     else {
@@ -13,6 +13,9 @@ function handleScreen() {
 }
 jQuery(document).ready(function($) {
     handleScreen();
+    $(window).resize(function(){
+        handleScreen();
+    });
     $(document).on('click','.popper-button', function(e) {
         e.preventDefault();
         let popper = $(this).data('popper');
@@ -34,7 +37,18 @@ jQuery(document).ready(function($) {
     $(document).on("click", "#menu-toggle", function() {
         $("aside#sidebar").toggleClass('show-sidebar');
     })
-    $(window).resize(function(){
-        handleScreen();
+    $(document).on("click",".menu-item.has-children > a", function(e) {
+        e.preventDefault();
+        let $this = $(this);
+        if($this.hasClass('show')) {
+            $this.removeClass('show');
+            $this.siblings(".menu-children").slideUp();
+        }
+        else {
+            $(".menu-item.has-children > a").removeClass("show");
+            $(".menu-item.has-children .menu-children").slideUp();
+            $this.addClass('show');
+            $this.siblings(".menu-children").slideDown();
+        }
     });
 });

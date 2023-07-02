@@ -1,5 +1,5 @@
 @extends('layouts.admin')
 
 @section('content')
-<p>dashboard</p>
+<p>users</p>
 @endsection

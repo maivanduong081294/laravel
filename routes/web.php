@@ -2,6 +2,8 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\Admin\GeneralController;
+use App\Http\Controllers\Admin\UserController as AdminUserController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -25,8 +27,9 @@ Route::get('/reset-password/{token}', [UserController::class,'resetPassword'])->
 Route::post('/reset-password', [UserController::class,'handleResetPassword'])->name('handle-reset-password');
 Route::get('logout', [UserController::class,'logout'])->name('logout');
 
-Route::prefix('admin')->middleware('checkUser')->group(function() {
-    Route::get('/', function() {
-        return view('admin.general.dashboard');
-    })->name('admin');
+Route::get('admin', [GeneralController::class,'index'])->middleware('checkUser')->name('admin');    
+Route::prefix('admin')->name('admin.')->middleware('checkUser')->group(function() {
+    Route::resources([
+        'users' => AdminUserController::class,
+    ]);
 });

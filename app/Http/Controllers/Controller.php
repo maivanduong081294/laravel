@@ -12,4 +12,13 @@ use Illuminate\Support\Facades\Cache;
 class Controller extends BaseController
 {
     use AuthorizesRequests, DispatchesJobs, ValidatesRequests;
+
+    protected $view_prefix = '';
+
+    protected function view($view,$data=[],$mergeData=[]) {
+        if($this->view_prefix) {
+            $view = $this->view_prefix.$view;
+        }
+        return view($view,$data,$mergeData);
+    }
 }

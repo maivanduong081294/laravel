@@ -14,7 +14,6 @@ use Illuminate\Support\Facades\Redis;
 
 class UserController extends Controller
 {
-    //
     public function Login(Request $request) {
         $title = 'Đăng nhập';
         echo $request->msg;

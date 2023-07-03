@@ -63,12 +63,7 @@ class BaseModel extends Model
             $keyCache = __FUNCTION__;
             $keyCache.= "-".json_encode($wheres);
             $value = self::getCache($keyCache);
-            if(self::hasCache($keyCache)) {
-                echo 'cached';
-                return $value;
-            }
-            else {
-                echo 'non cached';
+            if(!self::hasCache($keyCache)) {
                 $query = self::select();
                 foreach($wheres as $key => $item) {
                     if(is_array($item)) {
@@ -88,5 +83,18 @@ class BaseModel extends Model
             return $value;
         }
         return [];
+    }
+
+    public function getListByStatus($status=1,$method='=') {
+        $keyCache = __FUNCTION__;
+        $keyCache.= "-".json_encode($status);
+        $value = self::getCache($keyCache);
+        if(!self::hasCache($keyCache)) {
+            $query = self::select()->where('status',$method,$status);
+            $result = $query->get();
+            $value = $result?$result:false;
+            self::setCache($keyCache,$value);
+        }
+        return $value;
     }
 }

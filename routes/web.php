@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\Admin\GeneralController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
+use App\Http\Controllers\Admin\PermissionController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -32,4 +33,28 @@ Route::prefix('admin')->name('admin.')->middleware('checkUser')->group(function(
     Route::resources([
         'users' => AdminUserController::class,
     ]);
+
+    $adminRoutes = listRouteControler();
+    foreach($adminRoutes as $key => $routes) {
+        $prefix = trim(strtolower($key));
+        if(!empty($routes)) {
+            $controller = getAdminController($key,false);
+            if($controller) {
+                Route::prefix($prefix)->name($prefix.'.')->group(function() use($routes,$controller) {
+                    foreach($routes as $route) {
+                        $methods = explode(',',$route->method);
+                        if(!$route->method) {
+                            Route::get($route->uri,[$controller,$route->function])->name($route->function);
+                        }
+                        elseif(in_array('any',$methods)) {
+                            Route::any($route->uri,[$controller,$route->function])->name($route->function);
+                        }
+                        else {
+                            Route::match($methods,$route->uri,[$controller,$route->function])->name($route->function);
+                        }
+                    }
+                });
+            }
+        }
+    }
 });

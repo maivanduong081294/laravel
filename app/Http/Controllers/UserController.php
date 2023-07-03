@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Redis;
 
 class UserController extends Controller
 {
+    protected $view_prefix = 'authentication.';
     public function Login(Request $request) {
         $title = 'Đăng nhập';
         echo $request->msg;
@@ -41,7 +42,7 @@ class UserController extends Controller
                 return back()->withInput()->with('msg','Đăng nhập không thành công');
             }
         }
-        return view('authentication.login',compact('title'));
+        return $this->view('login',compact('title'));
     }
 
     public function logout() {
@@ -103,7 +104,7 @@ class UserController extends Controller
                 return redirect()->route('login')->with(['msg'=> 'Đăng ký thành công kiểm tra email để kích hoạt','type'=>'success']);
             }
         }
-        return view('authentication.register',compact('title'));
+        return $this->view('register',compact('title'));
     }
 
     public function verify(Request $request) {
@@ -174,7 +175,7 @@ class UserController extends Controller
                 }
             }
         }
-        return view('authentication.forgotPassword',compact('title'));
+        return $this->view('forgotPassword',compact('title'));
     }
 
     public function resetPassword(Request $request) {
@@ -184,7 +185,7 @@ class UserController extends Controller
             $result = PasswordReset::getDetailByWhere(['token' => $token]);
             if($result && $result->status == 0) {
                 $request->session()->flash('token', $token);
-                return view('authentication.resetPassword',compact('title'));
+                return $this->view('resetPassword',compact('title'));
             }
         }
         return redirect()->route('forgot-password')->with('msg','Đường dẫn đã hết hạn');

@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use App\Models\User;
 use App\Models\Group;
 use Database\Seeders\GroupSeeder;
+use Database\Seeders\RouteSeeder;
 use Hash;
 use Illuminate\Database\Seeder;
 class DatabaseSeeder extends Seeder
@@ -34,5 +35,7 @@ class DatabaseSeeder extends Seeder
                 ]
             )->create();
         }
+
+        $this->call(RouteSeeder::class);
     }
 }

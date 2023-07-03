@@ -19,6 +19,14 @@
         @show
         <main id="main">
             <div id="content">
+                @hasSection('heading')
+                <div class="page-breadcrumb">
+                    <h1>
+                        @yield('heading')
+                    </h1>
+                    @yield('breadcrumb')
+                </div>
+                @endif
                 @yield('content')
             </div>
             @include('layouts.admin.footer')

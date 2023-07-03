@@ -14,11 +14,16 @@ class Controller extends BaseController
     use AuthorizesRequests, DispatchesJobs, ValidatesRequests;
 
     protected $view_prefix = '';
+    protected $title = 'Laptop Now';
 
     protected function view($view,$data=[],$mergeData=[]) {
         if($this->view_prefix) {
             $view = $this->view_prefix.$view;
         }
+        $defaultData =  [
+            'title' => $this->title
+        ];
+        $data = array_merge($defaultData,$data);
         return view($view,$data,$mergeData);
     }
 }

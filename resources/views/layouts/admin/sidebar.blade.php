@@ -1,48 +1,35 @@
+@php
+    $permissionController = getAdminController('Permissions');
+    $menu = $permissionController->menu();
+@endphp
 <aside id="sidebar">
     <div class="sidebar-wrapper">
         <ul class="menu-list">
-            <li class="menu-item">
-                <a href="{{route('admin')}}">
-                    <span class="menu-icon"><i class="fa-solid fa-house"></i></span>
-                    <span class="menu-text">Bảng điều khiển</span>
-                </a>
-            </li>
-            <li class="menu-item has-children">
-                <a href="{{route('admin.users.index')}}">
-                    <span class="menu-icon"><i class="fa-solid fa-user"></i></span>
-                    <span class="menu-text">Tài khoản</span>
-                </a>
-                <ol class="menu-children">
-                    <li class="menu-child-item">
-                        <a href="{{route('admin.users.index')}}">
-                            <span class="menu-text">Danh sách</span>
-                        </a>
-                    </li>
-                    <li class="menu-child-item">
-                        <a href="{{route('admin')}}">
-                            <span class="menu-text">Bảng điều khiển</span>
-                        </a>
-                    </li>
-                    <li class="menu-child-item">
-                        <a href="{{route('admin')}}">
-                            <span class="menu-text">Bảng điều khiển</span>
-                        </a>
-                    </li>
-                </ol>
-            </li>
-            <li class="menu-item has-children">
-                <a href="{{route('admin')}}">
-                    <span class="menu-icon"><i class="fa-solid fa-user"></i></span>
-                    <span class="menu-text">Tài khoản</span>
-                </a>
-                <ol class="menu-children">
-                    <li class="menu-child-item">
-                        <a href="{{route('admin')}}">
-                            <span class="menu-text">Bảng điều khiển</span>
-                        </a>
-                    </li>
-                </ol>
-            </li>
+            @foreach ($menu as $item)
+            @if (empty($item['hidden']))
+                <li class="menu-item{{!empty($item['children']) ? ' has-children' : ''}}">
+                    <a href="{{$item['link']}}">
+                        <span class="menu-icon">{!!$item['icon']!!}</span>
+                        <span class="menu-text">{{$item['name']}}</span>
+                    </a>
+                    @if (!empty($item['children']))
+                    <ol class="menu-children">
+                        @foreach ($item['children'] as $subitem)
+                            @if (empty($subitem['hidden']))
+                            <li class="menu-child-item">
+                                <a href="{{$subitem['link']}}">
+                                    <span class="menu-text">
+                                        {{$subitem['name']}}
+                                    </span>
+                                </a>
+                            </li>
+                            @endif
+                        @endforeach
+                    </ol>
+                    @endif
+                </li>
+            @endif
+            @endforeach
         </ul>
         <div class="sidebar-footer">
             <a href="#"><i class="fa-solid fa-gear"></i></a>

@@ -2,11 +2,9 @@
 
 namespace App\Providers;
 
-use Illuminate\Auth\Notifications\VerifyEmail;
-use Illuminate\Notifications\Messages\MailMessage;
-use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Pagination\Paginator;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -29,5 +27,9 @@ class AppServiceProvider extends ServiceProvider
     {
         //
         Route::pattern('id', '[0-9]+');
+
+        //edit Paginator
+        Paginator::defaultView('vendor.pagination.default');
+        //Paginator::useBootstrap();
     }
 }

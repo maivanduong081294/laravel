@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Admin\Controller;
 use Illuminate\Http\Request;
 
+use App\Models\Route;
+
 class RouteController extends Controller
 {
     //
@@ -13,7 +15,9 @@ class RouteController extends Controller
     public function index() {
         $this->title = 'Danh sách định tuyến';
         $this->heading = 'Danh sách định tuyến';
-        return $this->view('index');
+        $route = new Route(['perPage' => 1]);
+        $list = $route->getList();
+        return $this->view('index',compact('list'));
     }
 
     public function add() {

@@ -18,7 +18,7 @@
             @include('layouts.admin.sidebar')
         @show
         <main id="main">
-            <div id="content">
+            <div id="container">
                 @hasSection('heading')
                 <div class="page-breadcrumb">
                     <h1>
@@ -27,7 +27,9 @@
                     @yield('breadcrumb')
                 </div>
                 @endif
-                @yield('content')
+                <div id="content">
+                    @yield('content')
+                </div>
             </div>
             @include('layouts.admin.footer')
         </main>

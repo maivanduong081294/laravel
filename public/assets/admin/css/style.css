@@ -9,7 +9,7 @@
     --sidebar-footer-height: 60px;
     --footer-height: 60px;
     --pd: 12px;
-    --content-pd: 30px;
+    --content-pd: 15px;
 }
 html *::-webkit-scrollbar {
     border-radius: 0;
@@ -256,6 +256,10 @@ a.popper-notifications-footer {
     padding-bottom: 20px;
     background: #ffffff;
 }
+#content {
+    padding: var(--content-pd);
+}
+
 /* Heading Main */
 .page-breadcrumb h1 {
     color: var(--primary-color);
@@ -359,6 +363,35 @@ a.popper-notifications-footer {
 #footer a {
     color: var(--heading-text);
     font-weight: bold;
+}
+
+/* Pagination */
+.pagination {
+    display: flex;
+    justify-content: center;
+    list-style: none;
+    padding: 20px 0 0;
+}
+.pagination a, .pagination span {
+    background: #ffffff;
+    color: var(--primary-color);
+    border: 1px solid var(--primary-color);
+    width: 32px;
+    height: 32px;
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.pagination .actived span {
+    background: var(--primary-color);
+    color: #fff;
+}
+.pagination .disabled span {
+    background: #ccc;
+}
+.pagination li + li a,.pagination li + li span {
+    border-left: 0;
 }
 
 /* Screen min 768 */

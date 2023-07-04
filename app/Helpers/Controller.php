@@ -25,6 +25,9 @@ function getAdminController($controller,$callClass=true) {
 
 function listRouteControler() {
     $routes = Route::getRoutes();
-    return $routes = json_decode(json_encode($routes));
+    if(!empty($routes)) {
+        return $routes = json_decode(json_encode($routes));
+    }
+    return false;
 }
 ?>

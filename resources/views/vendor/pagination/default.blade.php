@@ -4,9 +4,9 @@
     $current = $paginator->currentPage();
     $total = $paginator->total();
     if(count($elements) == 1) {
-        $list = $elements;
-        $first = $elements[0][1];
-        $last = $elements[0][$total];
+        $list = $elements[0];
+        $first = $list[1];
+        $last = $list[$total];
     }
     else {
         $first = $elements[0][1];

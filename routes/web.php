@@ -30,30 +30,28 @@ Route::get('logout', [UserController::class,'logout'])->name('logout');
 
 Route::get('admin', [GeneralController::class,'index'])->middleware('checkUser')->name('admin');    
 Route::prefix('admin')->name('admin.')->middleware('checkUser')->group(function() {
-    Route::resources([
-        'users' => AdminUserController::class,
-    ]);
-
     $adminRoutes = listRouteControler();
-    foreach($adminRoutes as $key => $routes) {
-        $prefix = trim(strtolower($key));
-        if(!empty($routes)) {
-            $controller = getAdminController($key,false);
-            if($controller) {
-                Route::prefix($prefix)->name($prefix.'.')->group(function() use($routes,$controller) {
-                    foreach($routes as $route) {
-                        $methods = explode(',',$route->method);
-                        if(!$route->method) {
-                            Route::get($route->uri,[$controller,$route->function])->name($route->function);
+    if(!empty($adminRoutes)) {
+        foreach($adminRoutes as $key => $routes) {
+            $prefix = trim(strtolower($key));
+            if(!empty($routes)) {
+                $controller = getAdminController($key,false);
+                if($controller) {
+                    Route::prefix($prefix)->name($prefix.'.')->group(function() use($routes,$controller) {
+                        foreach($routes as $route) {
+                            $methods = explode(',',$route->method);
+                            if(!$route->method) {
+                                Route::get($route->uri,[$controller,$route->function])->name($route->function);
+                            }
+                            elseif(in_array('any',$methods)) {
+                                Route::any($route->uri,[$controller,$route->function])->name($route->function);
+                            }
+                            else {
+                                Route::match($methods,$route->uri,[$controller,$route->function])->name($route->function);
+                            }
                         }
-                        elseif(in_array('any',$methods)) {
-                            Route::any($route->uri,[$controller,$route->function])->name($route->function);
-                        }
-                        else {
-                            Route::match($methods,$route->uri,[$controller,$route->function])->name($route->function);
-                        }
-                    }
-                });
+                    });
+                }
             }
         }
     }

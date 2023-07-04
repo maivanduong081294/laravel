@@ -15,7 +15,8 @@ class RouteController extends Controller
     public function index() {
         $this->title = 'Danh sách định tuyến';
         $this->heading = 'Danh sách định tuyến';
-        $route = new Route(['perPage' => 1]);
+        $route = new Route();
+        $route->setPerPage(1);
         $list = $route->getList();
         return $this->view('index',compact('list'));
     }

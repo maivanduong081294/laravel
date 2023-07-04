@@ -8,6 +8,15 @@ class Route extends BaseModel
 {
     use HasFactory;
 
+    protected $fillable = [
+        'title','uri', 'controller', 'function','status','super_admin',
+    ];
+
+    protected $attribtes = [
+        "status" => 1,
+        "super_admin" => 0,
+    ];
+
     public function getList(array $where = [], array $orderBy = []) {
         // $where = array_merge([
         //     [
@@ -22,7 +31,7 @@ class Route extends BaseModel
     public function getRoutes() {
         $keyCache = __FUNCTION__;
         $value = self::getCache($keyCache);
-        if(!self::hasCache($keyCache)) {
+        if(1 || !self::hasCache($keyCache)) {
             $query = self::where('status',1);
             $result = $query->orderby('controller')->get();
             if($result) {

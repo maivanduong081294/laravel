@@ -10,7 +10,6 @@ use Illuminate\Support\Str;
 use App\Models\User;
 use App\Models\PasswordReset;
 use App\Http\Controllers\MailerController;
-use Illuminate\Support\Facades\Redis;
 
 class UserController extends Controller
 {
@@ -94,7 +93,8 @@ class UserController extends Controller
                     'email' => $request->email,
                     'email_verified_token' => $token,
                 ];
-                $createUser = User::create($data);
+                $user = new User();
+                $createUser = $user->create($data);
                 
                 if($createUser) {
                     $mailer = new MailerController();

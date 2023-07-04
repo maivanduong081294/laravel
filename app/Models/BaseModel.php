@@ -14,12 +14,6 @@ class BaseModel extends Model
     public $orderBy = 'id';
     public $orderType = 'DESC';
 
-    public function __construct(Array $init=[]) {
-        if(isset($init['perPage'])) {
-            $this->perPage = $init['perPage'];
-        }
-    }
-
     public static function getTableName()
     {
         return with(new static)->getTable();

@@ -1,8 +1,8 @@
-@if ($paginator->hasPages())
+@if ($paginator->hasPages() && $paginator->count() > 0)
 @php
     $show = 5;
     $current = $paginator->currentPage();
-    $total = $paginator->total();
+    $total = $paginator->lastPage();
     if(count($elements) == 1) {
         $list = $elements[0];
         $first = $list[1];

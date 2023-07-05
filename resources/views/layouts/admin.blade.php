@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>@yield('title','Admin')</title>
+    <title>{{$title ?? 'Admin'}}</title>
     <link rel="icon" type="image/x-icon" href="{{getFavicon()}}">
     <link href="//fonts.googleapis.com/css?family=Quicksand:300,400,500,700" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
@@ -19,16 +19,16 @@
         @show
         <main id="main">
             <div id="container">
-                @hasSection('heading')
+                @if($heading)
                 <div class="page-breadcrumb">
                     <h1>
-                        @yield('heading')
+                        {{$heading}}
                     </h1>
-                    @yield('breadcrumb')
+                    <x-admin.breadcrumb data="{{json_encode($breadcrumb)}}" />
                 </div>
                 @endif
                 <div id="content">
-                    @yield('content')
+                    @include($view)
                 </div>
             </div>
             @include('layouts.admin.footer')

@@ -1,7 +1,7 @@
 <?php 
 use Illuminate\Support\Facades\Cache;
 function enabledCache() {
-    return true;
+    return false;
 }
 
 function expireCache() {
@@ -30,6 +30,14 @@ function setCache($key,$value,$expire = null) {
     }
     return false;
 }
+function rememberCache($key,$value,$expire = null) {
+    if(enabledCache()) {
+        return Cache::remember($key,$expire,function() use($value) {
+            return $value;
+        });
+    }
+    return false;
+}
 
 function removeCache($key) {
     if(enabledCache()) {
@@ -38,9 +46,7 @@ function removeCache($key) {
 }
 
 function flushCache() {
-    if(enabledCache()) {
-        return Cache::flush();
-    }
+    return Cache::flush();
 }
 
 function hasTagsCache($tags,$key) {
@@ -62,6 +68,14 @@ function setTagsCache(Array $tags,$key,$value,$expire=null) {
             $expire = expireCache();
         }
         return Cache::tags($tags)->put($key, $value, $expire);
+    }
+    return false;
+}
+function rememberTagsCache(Array $tags,$key,$value,$expire=null) {
+    if(enabledCache()) {
+        return Cache::tags($tags)->remember($key,$expire,function() use($value) {
+            return $value;
+        });
     }
     return false;
 }

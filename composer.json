@@ -44,6 +44,7 @@
         "files": [
             "app/Helpers/Cache.php",
             "app/Helpers/Controller.php",
+            "app/Helpers/Route.php",
             "app/Helpers/Functions.php"
         ]
     },

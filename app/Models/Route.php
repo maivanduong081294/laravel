@@ -9,7 +9,7 @@ class Route extends BaseModel
     use HasFactory;
 
     protected $fillable = [
-        'title','uri', 'controller', 'function','status','super_admin',
+        'title','uri', 'controller', 'function', 'middleware','status','hidden','super_admin',
     ];
 
     protected $attribtes = [
@@ -18,28 +18,54 @@ class Route extends BaseModel
     ];
 
     public function getList(array $where = [], array $orderBy = []) {
-        // $where = array_merge([
-        //     [
-        //         'super_admin',
-        //         '!=',
-        //         '1',
-        //     ]
-        // ],$where);
+        $where = array_merge([
+            [
+                'super_admin',
+                '!=',
+                '1',
+            ]
+        ],$where);
         return parent::getList($where,$orderBy);
     }
 
-    public function getRoutes() {
+    public function getTreeRoutes() {
         $keyCache = __FUNCTION__;
         $value = self::getCache($keyCache);
-        if(1 || !self::hasCache($keyCache)) {
-            $query = self::where('status',1);
-            $result = $query->orderby('controller')->get();
-            if($result) {
-                $routes = [];
-                foreach($result as $route) {
-                    $routes[$route->controller][$route->function] = $route;
+        if(!self::hasCache($keyCache)) {
+            $where = [
+                ['status',1],
+                ['parent_id',0]
+            ];
+            $routes = parent::getAllList($where);
+            if($routes) {
+                $newRoutes = [];
+                foreach($routes as $route) {
+                    $route->children = self::getChildrenRoutes($route->id);
+                    $newRoutes[] = $route;
                 }
-                $value = $routes;
+                $value = $newRoutes;
+            }
+            self::setCache($keyCache,$value);
+        }
+        return $value;
+    }
+
+    public function getChildrenRoutes($id) {
+        $keyCache = __FUNCTION__.'-'.$id;
+        $value = self::getCache($keyCache);
+        if(!self::hasCache($keyCache)) {
+            $where = [
+                ['status',1],
+                ['parent_id',$id]
+            ];
+            $routes = parent::getAllList($where);
+            if($routes) {
+                $newRoutes = [];
+                foreach($routes as $route) {
+                    $route->children = self::getChildrenRoutes($route->id);
+                    $newRoutes[] = $route;
+                }
+                $value = $newRoutes;
             }
             self::setCache($keyCache,$value);
         }

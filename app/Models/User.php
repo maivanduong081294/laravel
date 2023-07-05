@@ -85,8 +85,21 @@ CanResetPasswordContract
     }
 
     public function getCurrentUser() {
-        $user = Auth::user();
-        $user->avatar = asset('assets/admin/images/default-avatar.png');
-        return $user;
+        if(Auth::check()) {
+            $user = Auth::user();
+            $user->avatar = $user->avatar?$user->avatar:asset('assets/admin/images/default-avatar.png');
+            return $user;
+        }
+        return false;
+    }
+
+    public function superAdmin() {
+        $user = self::getCurrentUser();
+        if($user) {
+            if($user->id == 1) {
+                return true;
+            }
+        }
+        return false;
     }
 }

@@ -7,6 +7,8 @@ use Illuminate\Http\Request;
 
 use Auth;
 
+use App\Models\User;
+
 class PermissionController extends Controller
 {
     protected $view_prefix = 'admin.permissions.';
@@ -20,7 +22,6 @@ class PermissionController extends Controller
     public function index()
     {
         //
-        $this->setBreadcrumb();
         return $this->view('index');
     }
 
@@ -66,7 +67,7 @@ class PermissionController extends Controller
                 ]
             ];
         }
-        if($user->id === 1) {
+        if(User::superAdmin()) {
             $afterMenu[] = [
                 'name' => 'Định tuyến',
                 'link' => '/admin/routes',

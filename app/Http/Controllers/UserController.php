@@ -157,7 +157,7 @@ class UserController extends Controller
                     'created_at' => date('Y-m-d H:i:s')
                 );
 
-                $check = PasswordReset::getDetailByWhere(['email' => $data['email'], 'status' => 0]);
+                $check = PasswordReset::getDetail(['email' => $data['email'], 'status' => 0]);
                 if(!$check) {
                     $result = PasswordReset::create($data);
                     if($result) {
@@ -182,7 +182,7 @@ class UserController extends Controller
         $title = 'Đặt lại mật khẩu';
         $token = $request->token;
         if($token) {
-            $result = PasswordReset::getDetailByWhere(['token' => $token]);
+            $result = PasswordReset::getDetail(['token' => $token]);
             if($result && $result->status == 0) {
                 $request->session()->flash('token', $token);
                 return $this->view('resetPassword',compact('title'));
@@ -194,7 +194,7 @@ class UserController extends Controller
     public function handleResetPassword(Request $request) {
         $token = $request->session()->get('token');
         if($token) {
-            $result = PasswordReset::getDetailByWhere(['token' => $token]);
+            $result = PasswordReset::getDetail(['token' => $token]);
             if($result && $result->status == 0) {
                 $password = $request->password;
                 $rules = [

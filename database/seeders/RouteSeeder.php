@@ -17,32 +17,11 @@ class RouteSeeder extends Seeder
         //
         Route::factory()->count(6)->sequence(
             [
-                'title' => 'Phân quyền',
-                'uri' => '/',
-                'controller' => 'Permissions',
-                'function' => 'index',
-                'super_admin' => 1
-            ],
-            [
-                'title' => 'Thêm phân quyền',
-                'uri' => '/add',
-                'controller' => 'Permissions',
-                'function' => 'add',
-                'super_admin' => 1
-            ],
-            [
-                'title' => 'Sửa phân quyền',
-                'uri' => '/edit/{id}',
-                'controller' => 'Permissions',
-                'function' => 'edit',
-                'method' => 'POST,GET',
-                'super_admin' => 1
-            ],
-            [
                 'title' => 'Định tuyến',
-                'uri' => '/',
+                'uri' => '/routes',
                 'controller' => 'Routes',
                 'function' => 'index',
+                'method' => 'GET',
                 'super_admin' => 1
             ],
             [
@@ -50,6 +29,8 @@ class RouteSeeder extends Seeder
                 'uri' => '/add',
                 'controller' => 'Routes',
                 'function' => 'add',
+                'method' => 'POST,GET',
+                'parent_id' => 4,
                 'super_admin' => 1
             ],
             [
@@ -58,7 +39,31 @@ class RouteSeeder extends Seeder
                 'controller' => 'Routes',
                 'function' => 'edit',
                 'method' => 'POST,GET',
+                'parent_id' => 4,
                 'super_admin' => 1
+            ],
+            [
+                'title' => 'Phân quyền',
+                'uri' => '/permissions',
+                'controller' => 'Permissions',
+                'function' => 'index',
+                'method' => 'GET',
+            ],
+            [
+                'title' => 'Thêm phân quyền',
+                'uri' => '/add',
+                'controller' => 'Permissions',
+                'function' => 'add',
+                'method' => 'POST,GET',
+                'parent_id' => 1,
+            ],
+            [
+                'title' => 'Sửa phân quyền',
+                'uri' => '/edit/{id}',
+                'controller' => 'Permissions',
+                'function' => 'edit',
+                'method' => 'POST,GET',
+                'parent_id' => 1,
             ],
         )->create();
     }

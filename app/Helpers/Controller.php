@@ -1,6 +1,5 @@
 <?php
 $tag = '';
-use App\Models\Route;
 function listAdminController() {
     return [
         'General' => \App\Http\Controllers\Admin\GeneralController::class,
@@ -19,14 +18,6 @@ function getAdminController($controller,$callClass=true) {
         else {
             return $controllers[$controller];
         }
-    }
-    return false;
-}
-
-function listRouteControler() {
-    $routes = Route::getRoutes();
-    if(!empty($routes)) {
-        return $routes = json_decode(json_encode($routes));
     }
     return false;
 }

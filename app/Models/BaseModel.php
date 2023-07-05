@@ -27,6 +27,9 @@ class BaseModel extends Model
     }
 
     public function setCache($key,$value,$expire=null) {
+        if(gettype($value) == 'object') {
+            return rememberTagsCache([self::getTableName()],$key,$value,$expire);
+        }
         return setTagsCache([self::getTableName()],$key,$value,$expire);
     }
 
@@ -84,76 +87,48 @@ class BaseModel extends Model
         }
         return $query;
     }
-
-    public function getList(Array $where=[],Array $orderBy=[]) {
-        $keyCache = __FUNCTION__.'-'.json_encode(array_merge($where,$orderBy)).'-'.$this->perPage;
+    
+    public function getAllList(Array $where=[],Array $orderBy=[]) {
+        $keyCache = __FUNCTION__.'-'.json_encode(array_merge($where,$orderBy));
         $value = self::getCache($keyCache);
-        if(1 || !self::hasCache($keyCache)) {
+        if(!self::hasCache($keyCache)) {
             $query = self::select();
             $query = self::setWhere($query,$where);
             $query = self::setOrder($query,$orderBy);
-            $result = $query->paginate($this->perPage)->withQueryString();
+            $result = $query->get();
             $value = $result?$result:[];
             self::setCache($keyCache,$value);
         }
         return $value;
     }
 
-    public function getListByWhere(array $wheres) {
-        if(!empty($wheres)) {
-            $keyCache = __FUNCTION__;
-            $keyCache.= "-".json_encode($wheres);
-            $value = self::getCache($keyCache);
-            if(self::hasCache($keyCache)) {
-                return $value;
-            }
-            else {
-                $query = self::select();
-                foreach($wheres as $key => $item) {
-                    if(is_array($item)) {
-                        $name = $item['name'];
-                        $method = isset($item['method'])?$item['method']:'=';
-                        $value = $item['value'];
-                        $query->where($name,$method,$value);
-                    }
-                    else {
-                        $query->where($key,$item);
-                    }
-                }
-                $result = $query->get();
-                $value = $result?$result:'';
-                self::setCache($keyCache,$value);
-            }
-            return $value;
+    public function getList(Array $where=[],Array $orderBy=[]) {
+        $perPage = self::getPerPage();
+        $currentPage = isset($_REQUEST['page'])?$_REQUEST['page']:1;
+        $keyCache = __FUNCTION__.'-'.json_encode(array_merge($where,$orderBy)).'-'.$perPage.'-'.$currentPage;
+        $value = self::getCache($keyCache);
+        if(!self::hasCache($keyCache)) {
+            $query = self::select();
+            $query = self::setWhere($query,$where);
+            $query = self::setOrder($query,$orderBy);
+            $result = $query->paginate($perPage)->withQueryString();
+            $value = $result?$result:[];
+            self::setCache($keyCache,$value);
         }
-        return [];
+        return $value;
     }
 
-    public function getDetailByWhere(array $wheres) {
-        if(!empty($wheres)) {
-            $keyCache = __FUNCTION__;
-            $keyCache.= "-".json_encode($wheres);
-            $value = self::getCache($keyCache);
-            if(!self::hasCache($keyCache)) {
-                $query = self::select();
-                foreach($wheres as $key => $item) {
-                    if(is_array($item)) {
-                        $name = $item['name'];
-                        $method = isset($item['method'])?$item['method']:'=';
-                        $value = $item['value'];
-                        $query->where($name,$method,$value);
-                    }
-                    else {
-                        $query->where($key,$item);
-                    }
-                }
-                $result = $query->first();
-                $value = $result?$result:'';
-                self::setCache($keyCache,$value);
-            }
-            return $value;
+    public function getDetail(Array $where=[]) {
+        $keyCache = __FUNCTION__.'-'.json_encode(array_merge($where));
+        $value = self::getCache($keyCache);
+        if(!self::hasCache($keyCache)) {
+            $query = self::select();
+            $query = self::setWhere($query,$where);
+            $result = $query->first();
+            $value = $result?$result:[];
+            self::setCache($keyCache,$value);
         }
-        return [];
+        return $value;
     }
 
     public function getListByStatus($status=1,$method='=') {

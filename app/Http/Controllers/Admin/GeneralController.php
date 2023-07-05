@@ -14,8 +14,8 @@ class GeneralController extends Controller
     protected $heading = 'Bảng điều khiển';
 
     public function index(Request $request) {
-        $action = $request->route()->getAction();
-        $this->setBreadcrumb();
+        //$action = $request->route()->getAction();
+        //$this->setBreadcrumb();
         return $this->view('dashboard');
     }
 }

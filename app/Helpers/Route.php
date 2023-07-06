@@ -57,3 +57,9 @@ function setRoute($route) {
         }
     }
 }
+
+function routeMethods() {
+    return [
+        "GET","POST","PUT","DELETE",
+    ];
+}

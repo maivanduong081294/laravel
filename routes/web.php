@@ -1,9 +1,11 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+
 use App\Http\Controllers\UserController;
+
 use App\Http\Controllers\Admin\GeneralController;
-use App\Http\Controllers\Admin\RouteController;
+use App\Http\Controllers\Admin\AjaxController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -33,5 +35,6 @@ Route::get('/flush-cache', function() {
 
 Route::get('admin', [GeneralController::class,'index'])->middleware('checkUser')->name('admin');
 Route::prefix('admin')->name('admin.')->middleware('checkUser')->group(function() {
+    Route::any('/ajax', [AjaxController::class,'index'])->name('ajax');
     getAdminRoute();
 });

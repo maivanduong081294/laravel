@@ -9,10 +9,15 @@ use DB;
 class BaseModel extends Model
 {
     use HasFactory;
-
-    public $perPage = 25;
     public $orderBy = 'id';
     public $orderType = 'DESC';
+
+    public function __construct(Array $attributes = []) {
+        if(!in_array(self::getPerPage(), listShowItemsNumber())) {
+            self::setPerPage(session('perPage',20));
+        }
+        parent::__construct($attributes);
+    }
 
     public static function getTableName()
     {
@@ -37,15 +42,46 @@ class BaseModel extends Model
         return flushTagsCache(self::getTableName());
     }
 
+    public function setPerPage($number) {
+        $number = setShowItemsNumber($number);
+        return parent::setPerPage($number);
+    }
+
     public function setWhere($query,$where) {
         if(!empty($where)) {
             foreach($where as $key => $item) {
                 if(is_array($item)) {
-                    if(count($item) === 3) {
-                        $query->where($item[0],$item[1],$item[2]);
+                    if(is_array($item[0])) {
+                        $query->where(function ($query) use ($item) {
+                            $i = 0;
+                            foreach($item as $sub) {
+                                if($i == 0) {
+                                    if(count($sub) === 3) {
+                                        $query->where($sub[0],$sub[1],$sub[2]);
+                                    }
+                                    elseif(count($sub) === 2) {
+                                        $query->where($sub[0],$sub[1]);
+                                    }
+                                }
+                                else {
+                                    if(count($sub) === 3) {
+                                        $query->orWhere($sub[0],$sub[1],$sub[2]);
+                                    }
+                                    elseif(count($sub) === 2) {
+                                        $query->orWhere($sub[0],$sub[1]);
+                                    }
+                                }
+                                $i++;
+                            }
+                        });
                     }
-                    elseif(count($item) === 2) {
-                        $query->where($item[0],$item[1]);
+                    else {
+                        if(count($item) === 3) {
+                            $query->where($item[0],$item[1],$item[2]);
+                        }
+                        elseif(count($item) === 2) {
+                            $query->where($item[0],$item[1]);
+                        }
                     }
                 }
                 else {

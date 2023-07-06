@@ -12,8 +12,6 @@ class Controller extends BaseController
     protected $heading = 'Admin';
     protected $breadcrumb = [];
 
-    protected $layout = 'layouts.admin';
-
     protected function setBreadcrumb($links=[]) {
         $this->breadcrumb = array_merge($links,[
             ['title' => $this->heading],
@@ -29,12 +27,11 @@ class Controller extends BaseController
             $this->setBreadcrumb();
         }
         $defaultData =  [
-            'view' => $this->view_prefix.$view,
             'title' => $this->title,
             'heading' => $this->heading,
             'breadcrumb' => $this->breadcrumb,
         ];
         $data = array_merge($defaultData,$data);
-        return view($this->layout,$data,$mergeData);
+        return parent::view($view,$data,$mergeData);
     }
 }

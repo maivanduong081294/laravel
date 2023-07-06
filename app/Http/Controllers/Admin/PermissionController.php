@@ -50,7 +50,7 @@ class PermissionController extends Controller
         ];
     
         $afterMenu = [];
-        if($user->group_id === 1) {
+        if(User::isAdminUser()) {
             $afterMenu[] = [
                 'name' => 'Phân quyền',
                 'link' => '/admin/permissions',
@@ -67,7 +67,7 @@ class PermissionController extends Controller
                 ]
             ];
         }
-        if(User::superAdmin()) {
+        if(User::isRootUser()) {
             $afterMenu[] = [
                 'name' => 'Định tuyến',
                 'link' => '/admin/routes',

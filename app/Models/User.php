@@ -93,7 +93,19 @@ CanResetPasswordContract
         return false;
     }
 
-    public function superAdmin() {
+    public function isAdminUser() {
+        $check = self::isRootUser();
+        if(!$check) {
+            $user = self::getCurrentUser();
+            if($user) {
+                if($user->group_id == 1) {
+                    $check = true;
+                }
+            }
+        }
+        return $check;
+    }
+    public function isRootUser() {
         $user = self::getCurrentUser();
         if($user) {
             if($user->id == 1) {

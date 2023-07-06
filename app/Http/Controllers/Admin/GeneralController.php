@@ -18,4 +18,5 @@ class GeneralController extends Controller
         //$this->setBreadcrumb();
         return $this->view('dashboard');
     }
+
 }

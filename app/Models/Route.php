@@ -18,13 +18,15 @@ class Route extends BaseModel
     ];
 
     public function getList(array $where = [], array $orderBy = []) {
-        $where = array_merge([
-            [
-                'super_admin',
-                '!=',
-                '1',
-            ]
-        ],$where);
+        if(!User::isRootUser()) {
+            $where = array_merge([
+                [
+                    'super_admin',
+                    '!=',
+                    '1',
+                ]
+            ],$where);
+        }
         return parent::getList($where,$orderBy);
     }
 
@@ -66,6 +68,22 @@ class Route extends BaseModel
                     $newRoutes[] = $route;
                 }
                 $value = $newRoutes;
+            }
+            self::setCache($keyCache,$value);
+        }
+        return $value;
+    }
+
+    public function getControllers() {
+        $keyCache = __FUNCTION__;
+        $value = self::getCache($keyCache);
+        if(!self::hasCache($keyCache)) {
+            $result = parent::selectRaw("distinct(controller) as controller")->get();
+            if($result) {
+                $value = [];
+                foreach($result as $item) {
+                    $value[] = $item->controller;
+                }
             }
             self::setCache($keyCache,$value);
         }

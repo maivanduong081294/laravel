@@ -12,15 +12,32 @@ class Checkbox extends Component
      * @return void
      */ 
     
-    public $value,$name,$id,$label,$checked,$class;
-    public function __construct($value='',$class='',$name='',$id='',$label='',$checked=false)
+    public $value,$name,$id,$label,$checked,$class,$labelAttrs,$checkboxAttrs,$type;
+    public function __construct($value='',$class='',$name='',$id='',$label='',$checked=false,$type="checkbox",$inputClass='')
     {
-        $this->value = $value;
-        $this->name = $name;
-        $this->id = $id;
+        $checked = $checked==='true'?$checked:'';
+        $labelAttrs = [
+            'class' => 'style-checkbox '.$class,
+            'id' => $id,
+        ];
+
+        $checkboxAttrs = [
+            'name' => $name,
+            'id' => $id,
+            'class' => $inputClass,
+            'checked' => $checked,
+        ];
+
+        if($type!="radio") {
+            $type="checkbox";
+        }
+
+        $this->labelAttrs = setComponentAttributes($labelAttrs);
+        $this->checkboxAttrs = setComponentAttributes($checkboxAttrs);
         $this->label = $label;
         $this->checked = $checked?'true':'false';
-        $this->class = $class;
+        $this->type = $type;
+        $this->value = $value;
     }
 
     /**

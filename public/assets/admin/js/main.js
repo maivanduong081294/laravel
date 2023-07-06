@@ -1,6 +1,6 @@
 function handleScreen() {
     let screen = $(this).width();
-    if(screen >= 1170) {
+    if(screen >= 1200) {
         if($("aside#sidebar").hasClass('show-sidebar')) {
             $("aside#sidebar").removeClass('show-sidebar');
         }
@@ -50,5 +50,41 @@ jQuery(document).ready(function($) {
             $this.addClass('show');
             $this.siblings(".menu-children").slideDown();
         }
+    });
+    $('#set-show-items-number').on('change',function(e) {
+        e.preventDefault();
+        $number = $(this).val();
+        $(this).prop('disabled',true);
+        $.ajax({
+            url: '/admin/ajax',
+            data: {
+                action: 'setShowItemsNumber',
+                number: $number,
+            },
+            success: function(data) {
+                location.reload();
+            },
+            error: function() {
+                $(this).prop('disabled',false);
+                alert('Lỗi! Vui lòng thử lại sau!');
+            }
+        });
+    })
+    $('.check-list-all').on('change',function(e){
+        e.preventDefault();
+        let checked = false;
+        if($(this).is(':checked')) {
+            checked = true;
+        }
+        $('.check-list-all').prop('checked',checked);
+        $('.check-list-item').prop('checked',checked);
+    });
+    $('.check-list-item').on('change',function(e){
+        e.preventDefault();
+        let checked = false;
+        if(!$('.check-list-item:not(:checked)').length) {
+            checked = true;
+        }
+        $('.check-list-all').prop('checked',checked);
     });
 });

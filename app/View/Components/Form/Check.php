@@ -15,6 +15,7 @@ class Check extends Component
     public $value,$name,$id,$label,$checked;
     public function __construct($value='',$name,$id,$label,$checked=false)
     {
+        $checked = $checked==='true'?true:false;
         $this->value = $value;
         $this->name = $name;
         $this->id = $id;

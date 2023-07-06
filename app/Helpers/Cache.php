@@ -1,7 +1,7 @@
 <?php 
 use Illuminate\Support\Facades\Cache;
 function enabledCache() {
-    return false;
+    return true;
 }
 
 function expireCache() {

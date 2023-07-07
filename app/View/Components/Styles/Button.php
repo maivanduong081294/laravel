@@ -15,7 +15,6 @@ class Button extends Component
     public function __construct($content,$onclick="",$class="",$id="",$href="",$target="",$type="")
     {
         //
-        $class = '';
         $attributes = [
             'class' => 'style-btn '.$class,
             'id' => $id,

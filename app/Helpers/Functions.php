@@ -28,3 +28,13 @@ function setShowItemsNumber($number) {
     }
     return $number;
 }
+
+function checkSortingTable($name) {
+    $orderBy = request()->orderBy;
+    $orderType = request()->orderType;
+    $respone = '';
+    if($name == $orderBy) {
+        $respone = $orderType == strtolower("DESC")?'desc':'asc';
+    }
+    return $respone;
+}

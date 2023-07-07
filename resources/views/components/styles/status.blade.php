@@ -1,5 +1,5 @@
 @if ($message)
-    <button class="{{$class}} btn btn-{{$type}}" value="{{$value}}">
+    <button {!!$attrs!!}>
         {{$message}}
     </button>
 @endif

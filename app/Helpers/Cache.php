@@ -87,16 +87,23 @@ function flushTagsCache($tag) {
 }
 
 function handleGetValue($value) {
-    $newValue = json_decode($value);
-    if($newValue) {
-        return $newValue;
+    if(!empty($value)) {
+        $newValue = json_decode($value);
+        if($newValue) {
+            return $newValue;
+        }
     }
     return $value;
 }
 
 function handleSetValue($value) {
-    if(is_array($value) || is_object($value)) {
-        $value = json_encode($value);
+    if((is_array($value) || is_object($value))) {
+        if(empty($value)) {
+            $value = false;
+        }
+        else {
+            $value = json_encode($value);
+        }
     }
     return $value;
 }

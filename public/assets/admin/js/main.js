@@ -1,3 +1,6 @@
+let ajaxUrl = null;
+let ajaxUpdateUrl = null;
+let ajaxToken = null;
 function handleScreen() {
     let screen = $(this).width();
     if(screen >= 1200) {
@@ -52,23 +55,30 @@ jQuery(document).ready(function($) {
         }
     });
     $('#set-show-items-number').on('change',function(e) {
-        e.preventDefault();
-        $number = $(this).val();
-        $(this).prop('disabled',true);
-        $.ajax({
-            url: '/admin/ajax',
-            data: {
-                action: 'setShowItemsNumber',
-                number: $number,
-            },
-            success: function(data) {
-                location.reload();
-            },
-            error: function() {
-                $(this).prop('disabled',false);
-                alert('Lỗi! Vui lòng thử lại sau!');
-            }
-        });
+        if(ajaxUrl) {
+            e.preventDefault();
+            $number = $(this).val();
+            $(this).prop('disabled',true);
+            $.ajax({
+                url: ajaxUrl,
+                data: {
+                    action: 'setShowItemsNumber',
+                    number: $number,
+                },
+                success: function(data) {
+                    location.reload();
+                },
+                error: function(response) {
+                    $(this).prop('disabled',false);
+                    if(response.responseJSON.message) {
+                        alert(response.responseJSON.message);
+                    }
+                    else {
+                        alert('Lỗi! Vui lòng thử lại sau!');
+                    }
+                }
+            });
+        }
     })
     $('.check-list-all').on('change',function(e){
         e.preventDefault();
@@ -87,4 +97,90 @@ jQuery(document).ready(function($) {
         }
         $('.check-list-all').prop('checked',checked);
     });
+    $('.data-sorting').on('click',function() {
+        let Form = $('#data-form');
+        if(Form.length) {
+            let orderBy = $(this).data('order-by');
+            if(orderBy) {
+                Form.find('input[name="orderBy"').val(orderBy);
+                let orderType = $(this).data('order-type');
+                orderType = orderType=='desc'?'desc':'asc';
+                Form.find('input[name="orderType"').val(orderType);
+                $('#data-form').submit();
+            }
+        }
+    });
+    $(document).on('click','.table-data .btn.update-data',function (e){
+        if(ajaxUpdateUrl) {
+            e.preventDefault();
+            const id = $(this).parents('tr').find('input[name="id"]').val();
+            const key = $(this).data('name');
+            const value = $(this).data('update');
+            $.ajax({
+                url: ajaxUpdateUrl,
+                type: 'POST',
+                data: {
+                    id: id,
+                    [key]: value,
+                    _token: ajaxToken,
+                },
+                success: function(data) {
+                    location.reload();
+                },
+                error: function(response, status, error) {
+                    $(this).prop('disabled',false);
+                    if(response.responseJSON.message) {
+                        alert(response.responseJSON.message);
+                    }
+                    else {
+                        alert('Lỗi! Vui lòng thử lại sau!');
+                    }
+                }
+            });
+        }
+    });
+    $('.btn-handle-checkbox').on('click',function(e) {
+        e.preventDefault();
+        if(ajaxUpdateUrl) {
+            const action = $(this).siblings('.list-handle-checkbox').val();
+            const list = $('.check-list-item:checked');
+            if(list.length > 0) {
+                if(action) {
+                    let ids = [];
+                    list.map((i, item)=> {
+                        ids.push(item.value);
+                    });
+                    //$(this).prop('disabled',true);
+                    $.ajax({
+                        url: ajaxUpdateUrl,
+                        type: 'POST',
+                        data: {
+                            ids: ids,
+                            action: action,
+                            _token: ajaxToken,
+                        },
+                        success: function(data) {
+                            alert('Thành công!');
+                            location.reload();
+                        },
+                        error: function(response, status, error) {
+                            $(this).prop('disabled',false);
+                            if(response.responseJSON.message) {
+                                alert(response.responseJSON.message);
+                            }
+                            else {
+                                alert('Lỗi! Vui lòng thử lại sau!');
+                            }
+                        }
+                    });
+                }
+                else {
+                    alert('Vui lòng chọn hành động');
+                }
+            }
+            else {
+                alert('Vui lòng chọn thành phần cần thực hiện');
+            }
+        }
+    })
 });

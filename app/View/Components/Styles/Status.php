@@ -12,14 +12,9 @@ class Status extends Component
      * @return void
      */
 
-    public $value,$message,$type,$name,$class;
-    public function __construct(string $value='',string $name='status',string $message='',string $type='success',string $class='')
+    public $attrs,$value,$message,$type,$name,$class;
+    public function __construct(string $value='',string $name='status',string $message='',string $type='success',string $class='',$update="")
     {
-        //
-        $this->value = $value;
-        $this->name = $name;
-        $this->class = $class;
-
         if(!$message) {
             if($name == 'status') {
                 switch ($value) {
@@ -32,8 +27,18 @@ class Status extends Component
                         $type = 'success';
                 }
             }
+            elseif($name == 'hidden') {
+                switch ($value) {
+                    case 1: 
+                        $message = 'Ẩn';
+                        $type = 'danger';
+                        break;
+                    default:
+                        $message = 'Hiển thị';
+                        $type = 'success';
+                }
+            }
         }
-        $this->message = $message;
 
         $types = [
             'primary',
@@ -50,7 +55,20 @@ class Status extends Component
             $type = 'success';
         }
 
-        $this->type = $type;
+        $class = $class.' btn btn-'.$type;
+        if($update != "" || $update != null) {
+            $class.= " update-data";
+        }
+
+        $attrs = [
+            'class' => $class,
+            'value' => $value,
+            'data-update' => $update,
+            'data-name' => $name
+        ];
+
+        $this->attrs = setComponentAttributes($attrs);
+        $this->message = $message;
     }
 
     /**

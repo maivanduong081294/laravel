@@ -132,7 +132,7 @@ class BaseModel extends Model
             $query = self::setWhere($query,$where);
             $query = self::setOrder($query,$orderBy);
             $result = $query->get();
-            $value = $result?$result:[];
+            $value = $result->count() > 0?$result:[];
             self::setCache($keyCache,$value);
         }
         return $value;
@@ -148,7 +148,7 @@ class BaseModel extends Model
             $query = self::setWhere($query,$where);
             $query = self::setOrder($query,$orderBy);
             $result = $query->paginate($perPage)->withQueryString();
-            $value = $result?$result:[];
+            $value = $result->count() > 0?$result:[];
             self::setCache($keyCache,$value);
         }
         return $value;
@@ -161,7 +161,34 @@ class BaseModel extends Model
             $query = self::select();
             $query = self::setWhere($query,$where);
             $result = $query->first();
-            $value = $result?$result:[];
+            $value = $result->count() > 0?$result:[];
+            self::setCache($keyCache,$value);
+        }
+        return $value;
+    }
+
+    public function getDetailById(int $id) {
+        $keyCache = __FUNCTION__.'-'.$id;
+        $value = self::getCache($keyCache);
+        if(!self::hasCache($keyCache)) {
+            $result = self::find($id);
+            $value = $result->count() > 0?$result:[];
+            self::setCache($keyCache,$value);
+        }
+        return $value;
+    }
+    public function getListByIds(array $ids,Array $where=[]) {
+        if(empty($ids)) {
+            return false;
+        }
+        sort($ids);
+        $keyCache = __FUNCTION__.'-'.json_encode(array_merge($ids,$where));
+        $value = self::getCache($keyCache);
+        if(!self::hasCache($keyCache)) {
+            $query = self::select();
+            $query = self::setWhere($query,$where);
+            $result = $query->whereIn('id',$ids)->get();
+            $value = $result->count() > 0?$result:[];
             self::setCache($keyCache,$value);
         }
         return $value;
@@ -174,9 +201,26 @@ class BaseModel extends Model
         if(!self::hasCache($keyCache)) {
             $query = self::select()->where('status',$method,$status);
             $result = $query->get();
-            $value = $result?$result:false;
+            $value = $result->count() > 0?$result:[];
             self::setCache($keyCache,$value);
         }
         return $value;
+    }
+
+    public function deleteById(array $id) {
+        self::where('id',$id)->delete();
+        self::flushCache();
+        return true;
+    }
+
+    public function deleteByIds(array $ids,Array $where=[]) {
+        if(empty($ids)) {
+            return false;
+        }
+        $query = self::select();
+        $query = self::setWhere($query,$where);
+        $query->whereIn('id',$ids)->delete();
+        self::flushCache();
+        return true;
     }
 }

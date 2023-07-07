@@ -10,7 +10,8 @@ function setComponentAttributes($attributes = []) {
 }
 
 function setComponentAttribute($key,$value=null) {
-    if($value && trim($value)) {
+    $value = trim($value);
+    if($value != "" || $value != null) {
         $value = trim($value);
         return " $key=\"$value\"";
     }

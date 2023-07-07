@@ -15,7 +15,6 @@ class Select extends Component
     public function __construct($values,$onchange="",$class="",$id="",$name='',$selected="",$default="",$keyByValue="0")
     {
         //
-        $class = '';
         $attributes = [
             'class' => 'style-select '.$class,
             'id' => $id,

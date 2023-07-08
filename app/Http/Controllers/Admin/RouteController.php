@@ -88,12 +88,29 @@ class RouteController extends Controller
     }
 
     public function add() {
-        return 'add';
+        $this->title = 'Thêm định tuyến';
+        $this->heading = 'Thêm định tuyến';
+        $breadcrumbs = [
+            [
+                'title' => 'Định tuyến',
+                'link' => route('admin.routes.index'),
+            ]
+        ];
+        self::setBreadcrumb($breadcrumbs);
+        return $this->view('add');
     }
 
     public function edit(Request $request) {
-        echo $request->id;
-        return 'edit';
+        $this->title = 'Chỉnh sửa định tuyến';
+        $this->heading = 'Chỉnh sửa định tuyến';
+        $breadcrumbs = [
+            [
+                'title' => 'Định tuyến',
+                'link' => route('admin.routes.index'),
+            ]
+        ];
+        self::setBreadcrumb($breadcrumbs);
+        return $this->view('add');
     }
 
     public function delete(Request $request) {

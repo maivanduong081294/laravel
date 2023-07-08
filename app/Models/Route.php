@@ -9,7 +9,7 @@ class Route extends BaseModel
     use HasFactory;
 
     protected $fillable = [
-        'title','uri', 'controller', 'function', 'middleware','status','hidden','super_admin',
+        'title','as','uri', 'controller', 'function', 'middleware','status','hidden','super_admin',
     ];
 
     protected $attribtes = [
@@ -85,6 +85,16 @@ class Route extends BaseModel
                     $value[] = $item->controller;
                 }
             }
+            self::setCache($keyCache,$value);
+        }
+        return $value;
+    }
+
+    public function getRouteByName($name) {
+        $keyCache = __FUNCTION__.$name;
+        $value = self::getCache($keyCache);
+        if(!self::hasCache($keyCache)) {
+            $value = parent::where('name',$name)->first();
             self::setCache($keyCache,$value);
         }
         return $value;

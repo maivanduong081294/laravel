@@ -207,7 +207,7 @@ class BaseModel extends Model
         return $value;
     }
 
-    public function deleteById(array $id) {
+    public function deleteById($id) {
         self::where('id',$id)->delete();
         self::flushCache();
         return true;

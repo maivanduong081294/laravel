@@ -16,6 +16,7 @@ class CreateRoutesTable extends Migration
         Schema::create('routes', function (Blueprint $table) {
             $table->id();
             $table->string('title',255);
+            $table->string('name',255)->nullable();
             $table->string('uri',255);
             $table->string('controller',255);
             $table->string('function',255);

@@ -12,17 +12,33 @@ class Input extends Component
      * @return void
      */
 
-    public $name,$type,$placeholder,$value,$id,$label,$icon;
-    public function __construct($value='',$name,$type='text',$placeholder='',$label='',$id='',$icon='')
+    public $name,$id,$label,$icon,$attrs,$inputAttrs;
+    public function __construct($name,$value='',$type='text',$placeholder='',$label='',$id='',$icon='',$class='',$onchange='',$inputClass="")
     {
         //
+
+        if($placeholder == 'true') {
+            $placeholder = trim($label)?trim($label):"";
+        }
+        $inputAttrs = [
+            'class' => $inputClass,
+            'id' => $id,
+            'onChange' => $onchange,
+            'type'=>$type,
+            'value' => $value,
+            'placeholder' => $placeholder,
+            'name' => $name,
+        ];
+
+        $attrs = [
+            'class' => 'form-input '.$class,
+        ];
         $this->name = $name;
-        $this->value = $value;
-        $this->type = $type;
-        $this->placeholder = $placeholder;
         $this->label = $label;
         $this->id = $id;
         $this->icon = $icon;
+        $this->attrs = setComponentAttributes($attrs);
+        $this->inputAttrs = setComponentAttributes($inputAttrs);
     }
 
     /**

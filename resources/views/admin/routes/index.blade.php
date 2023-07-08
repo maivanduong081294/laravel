@@ -22,6 +22,7 @@
 <tr>
     <th class="text-center"><x-styles.checkbox type="checkbox" input-class="check-list-all"/></th>
     <x-styles.th order-by="title" text="Title"/>
+    <x-styles.th order-by="name" text="Name"/>
     <x-styles.th order-by="uri" text="Uri"/>
     <x-styles.th order-by="controller" text="Controller"/>
     <x-styles.th order-by="function" text="Function"/>
@@ -29,6 +30,7 @@
     <x-styles.th order-by="middleware" text="Middleware"/>
     <x-styles.th order-by="hidden" text="Permission"/>
     <x-styles.th order-by="status" text="Status"/>
+    <x-styles.th text=""/>
 </tr>
 @php
     $columns = ob_get_contents();
@@ -84,13 +86,18 @@
                         <td data-title="Title">
                             <a href="{{route('admin.routes.edit',['id'=>$item->id])}}">{{$item->title}}</a>
                         </td>
+                        <td data-title="Name">{{$item->name}}</td>
                         <td data-title="Uri">{{$item->uri}}</td>
                         <td data-title="Controller">{{$item->controller}}</td>
                         <td data-title="Function">{{$item->function}}</td>
                         <td data-title="Methods">{{$item->method}}</td>
                         <td data-title="Middleware">{{$item->middleware}}</td>
-                        <td class="min-col" data-title="Permission"><x-styles.status value="{{$item->hidden}}" name="hidden" update="{{$item->hidden?0:1}}" /></td>
-                        <td class="min-col" data-title="Status"><x-styles.status value="{{$item->status}}" name="status" update="{{$item->status?0:1}}"/></td>
+                        <td data-title="Permission" class="min-col"><x-styles.status value="{{$item->hidden}}" name="hidden" update="{{$item->hidden?0:1}}" /></td>
+                        <td data-title="Status" class="min-col"><x-styles.status value="{{$item->status}}" name="status" update="{{$item->status?0:1}}"/></td>
+                        <td class="text-center">
+                            <x-styles.button href="{{route('admin.routes.edit',$item->id)}}" class="btn-warning" content='<i class="fa-solid fa-pen"></i>'/>
+                            <x-styles.button class="btn-delete-data btn-danger" content='<i class="fa-solid fa-trash"></i>'/>
+                        </td>
                     </tr>
                 @endforeach
                 @endif
@@ -115,5 +122,6 @@
 @section('js')
     <script>
         ajaxUpdateUrl = {!! json_encode(route('admin.routes.update')) !!}
+        ajaxDeleteUrl = {!! json_encode(route('admin.routes.delete')) !!}
     </script>
 @endsection

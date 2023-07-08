@@ -1,6 +1,7 @@
-let ajaxUrl = null;
-let ajaxUpdateUrl = null;
-let ajaxToken = null;
+let ajaxUrl = '';
+let ajaxToken = '';
+let ajaxUpdateUrl = '';
+let ajaxDeleteUrl = '';
 function handleScreen() {
     let screen = $(this).width();
     if(screen >= 1200) {
@@ -57,8 +58,9 @@ jQuery(document).ready(function($) {
     $('#set-show-items-number').on('change',function(e) {
         if(ajaxUrl) {
             e.preventDefault();
-            $number = $(this).val();
-            $(this).prop('disabled',true);
+            const $this = $(this);
+            $number = $this.val();
+            $this.prop('disabled',true);
             $.ajax({
                 url: ajaxUrl,
                 data: {
@@ -69,7 +71,7 @@ jQuery(document).ready(function($) {
                     location.reload();
                 },
                 error: function(response) {
-                    $(this).prop('disabled',false);
+                    $this.prop('disabled',false);
                     if(response.responseJSON.message) {
                         alert(response.responseJSON.message);
                     }
@@ -141,8 +143,11 @@ jQuery(document).ready(function($) {
     });
     $('.btn-handle-checkbox').on('click',function(e) {
         e.preventDefault();
-        if(ajaxUpdateUrl) {
-            const action = $(this).siblings('.list-handle-checkbox').val();
+        const $this = $(this);
+        const action = $this.siblings('.list-handle-checkbox').val();
+        const actionUrl = action == 'delete' ? ajaxDeleteUrl : ajaxUpdateUrl;
+        const actionMethod = action == 'delete' ? 'DELETE' : 'POST';
+        if(actionUrl) {
             const list = $('.check-list-item:checked');
             if(list.length > 0) {
                 if(action) {
@@ -150,21 +155,22 @@ jQuery(document).ready(function($) {
                     list.map((i, item)=> {
                         ids.push(item.value);
                     });
-                    //$(this).prop('disabled',true);
+                    $this.prop('disabled',true);
                     $.ajax({
-                        url: ajaxUpdateUrl,
-                        type: 'POST',
+                        url: actionUrl,
+                        type: actionMethod,
                         data: {
                             ids: ids,
                             action: action,
                             _token: ajaxToken,
                         },
                         success: function(data) {
+                            $this.prop('disabled',false);
                             alert('Thành công!');
                             location.reload();
                         },
                         error: function(response, status, error) {
-                            $(this).prop('disabled',false);
+                            $this.prop('disabled',false);
                             if(response.responseJSON.message) {
                                 alert(response.responseJSON.message);
                             }
@@ -182,5 +188,41 @@ jQuery(document).ready(function($) {
                 alert('Vui lòng chọn thành phần cần thực hiện');
             }
         }
-    })
+        else {
+            alert('Lỗi! Vui lòng thử lại sau!');
+        }
+    });
+    $('.btn-delete-data').on('click',function(e) {
+        e.preventDefault();
+        const $this = $(this);
+        const id = $(this).parents('tr').find('input[name="id"]').val();
+        if(ajaxDeleteUrl) {
+            $this.prop('disabled',true);
+            $.ajax({
+                url: ajaxDeleteUrl,
+                type: 'DELETE',
+                data: {
+                    id: id,
+                    _token: ajaxToken,
+                },
+                success: function(data) {
+                    $this.prop('disabled',false);
+                    alert('Thành công!');
+                    location.reload();
+                },
+                error: function(response, status, error) {
+                    $this.prop('disabled',false);
+                    if(response.responseJSON.message) {
+                        alert(response.responseJSON.message);
+                    }
+                    else {
+                        alert('Lỗi! Vui lòng thử lại sau!');
+                    }
+                }
+            });
+        }
+        else {
+            alert('Lỗi! Vui lòng thử lại sau!');
+        }
+    });
 });

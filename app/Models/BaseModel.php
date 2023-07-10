@@ -171,8 +171,7 @@ class BaseModel extends Model
         $keyCache = __FUNCTION__.'-'.$id;
         $value = self::getCache($keyCache);
         if(!self::hasCache($keyCache)) {
-            $result = self::find($id);
-            $value = $result->count() > 0?$result:[];
+            $value = self::find($id);
             self::setCache($keyCache,$value);
         }
         return $value;

@@ -9,6 +9,7 @@
     <link href="//fonts.googleapis.com/css?family=Quicksand:300,400,500,700" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="{{asset('assets/admin/css/style.css')}}">
 </head>
 <body>
@@ -35,6 +36,7 @@
                 </div>
                 @endif
                 <div id="content">
+                    @yield('alert')
                     @yield('content')
                 </div>
             </div>
@@ -42,6 +44,7 @@
         </main>
     </main>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <script src="{{asset('assets/admin/js/main.js')}}"></script>
     <script>
         ajaxUrl = {!! json_encode(route('admin.ajax')) !!}

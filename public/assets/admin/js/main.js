@@ -15,10 +15,25 @@ function handleScreen() {
         }
     }
 }
-jQuery(document).ready(function($) {
+$(document).ready(function() {
     handleScreen();
     $(window).resize(function(){
         handleScreen();
+    });
+    $('.select2').each(function() {
+        var $this = $(this);
+        var attributes = {
+            width: "resolve",
+            closeOnSelect: false,
+            allowClear: true
+        };
+        if($this.hasClass('multiple')) {
+            attributes.multiple = true;
+        }
+        if($this.data('placeholder')) {
+            attributes.placeholder = $this.data('placeholder');
+        }
+        $(this).select2(attributes);
     });
     $(document).on('click','.popper-button', function(e) {
         e.preventDefault();

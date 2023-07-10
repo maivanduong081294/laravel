@@ -8,11 +8,12 @@ use Illuminate\Http\Request;
 use Auth;
 
 use App\Models\User;
+use App\Models\Permission;
 
 class PermissionController extends Controller
 {
     protected $view_prefix = 'admin.permissions.';
-    private $homeRoute = 'admin.permissions.index';
+    private $homeRoute = 'admin.permissions';
 
     public function __construct() {
         $this->title = 'Phân quyền';
@@ -22,7 +23,10 @@ class PermissionController extends Controller
     public function index()
     {
         //
-        return $this->view('index');
+        $permission = new Permission();
+        $list = $permission->getAllList();
+        $perPage = $permission->getPerPage();
+        return $this->view('index',compact('list','perPage'));
     }
 
     public function add() {

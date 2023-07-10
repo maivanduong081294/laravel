@@ -9,7 +9,7 @@ class Route extends BaseModel
     use HasFactory;
 
     protected $fillable = [
-        'title','as','uri', 'controller', 'function', 'middleware','status','hidden','super_admin',
+        'title','as','uri', 'controller', 'function', 'middleware','status','hidden','super_admin','name','parent_id',
     ];
 
     protected $attribtes = [
@@ -38,7 +38,13 @@ class Route extends BaseModel
                 ['status',1],
                 ['parent_id',0]
             ];
-            $routes = parent::getAllList($where);
+            $order = [
+                [
+                    'orderBy' => 'title',
+                    'orderType' => 'ASC',
+                ]
+            ];
+            $routes = parent::getAllList($where,$order);
             if($routes) {
                 $newRoutes = [];
                 foreach($routes as $route) {
@@ -60,7 +66,13 @@ class Route extends BaseModel
                 ['status',1],
                 ['parent_id',$id]
             ];
-            $routes = parent::getAllList($where);
+            $order = [
+                [
+                    'orderBy' => 'title',
+                    'orderType' => 'ASC',
+                ]
+            ];
+            $routes = parent::getAllList($where,$order);
             if($routes) {
                 $newRoutes = [];
                 foreach($routes as $route) {
@@ -98,5 +110,61 @@ class Route extends BaseModel
             self::setCache($keyCache,$value);
         }
         return $value;
+    }
+
+    public function showTreeRoute($ids=[], $parents=[], $parent_route = [],$prefix='') {
+        if(empty($parent_route)) {
+            $routes = Route::getTreeRoutes();
+        }
+        else {
+            $routes = null;
+            $route = $parent_route;
+        }
+        if(is_array($routes)) {
+            foreach($routes as $route) {
+                if(((is_array($ids) && in_array($route->id,$ids)) || $ids == $route->id)) {
+                    continue;
+                }
+                $parents[$route->id] = $route->title;
+                if(!empty($route->children)) {
+                    foreach($route->children as $child) {
+                        $parents = self::showTreeRoute($ids, $parents, $child);
+                    }
+                }
+            }
+        }
+        else {
+            if(((is_array($ids) && in_array($route->id,$ids)) || $ids == $route->id)) {
+                return $parents;
+            }
+            $prefix=$prefix.'---';
+            $parents[$route->id] = $prefix.' '.$route->title;
+            if($route->children) {
+                foreach($route->children as $child) {
+                    $parents = self::showTreeRoute($ids, $parents, $child, $prefix);
+                }
+            }
+        }
+        return $parents;
+    }
+
+    public function create($data) {
+        if(isset($data['parent_id']) && $data['parent_id'] > 0) {
+            $parentDetail = self::getDetailById($data['parent_id']);
+            if($parentDetail) {
+                if($parentDetail->function == 'index') {
+                    $data['name'] = str_replace($parentDetail->function,$data['function'],$parentDetail->name);
+                }
+                else {
+                    $data['name'] = $parentDetail->name.'.'.$data['function'];
+                }
+            }
+        }
+        else {
+            $data['name'] = 'admin.'.$data['function'];
+        }
+        $result = parent::create($data);
+        self::flushCache();
+        return $result;
     }
 }

@@ -3,7 +3,7 @@
     --primary-opacity-color: #537b3512;
     --primary-text: #ffffff;
     --border-color: #e9ecef;
-    --text-color: #a1aab2;
+    --text-color: #67757c;
     --heading-text:#212529;
     --header-height: 70px;
 	--sidebar-width: 240px;
@@ -66,6 +66,10 @@ a {
 }
 a:hover {
     color: #343a40;
+}
+button, input, optgroup, select, textarea {
+    color: inherit;
+    line-height: inherit;
 }
 input[type="button"], input[type="submit"] {
 	transition: 0.5s color, 0.5s background;
@@ -608,17 +612,36 @@ a.popper-notifications-footer {
 }
 
 /* Form */
-.detail-group {
-    background: #fff;
-    padding: 10px 15px;
+.form-group {
     margin-top: 20px;
 }
-.detail-group:first-child {
+.form-group:first-child {
     margin-top: 0;
+}
+.form-group-heading {
+    display: flex;
+    align-items: center;
+    background: #e0e0e0;
+    color: var(--heading-text);
+    padding: 15px;
+}
+.form-group-heading h2 {
+    font-weight: bold;
+}
+.form-group-heading i {
+    color: #b2b2b2;
+    margin-right: 10px;
+}
+.form-group-body {
+    background: #fff;
+    padding: 20px 15px;
 }
 .form-input {
 	text-align: left;
 	margin-bottom: 20px;
+}
+.form-input:last-child {
+    margin-bottom: 0;
 }
 .form-input-wrapper {
 	border: 2px solid var(--primary-color);
@@ -673,6 +696,43 @@ a.popper-notifications-footer {
 	outline: none;
 	border: none;
 	padding: 0;
+}
+.form-select-wrapper {
+    display: flex;
+    align-items: center;
+    position: relative;
+}
+.form-select-wrapper .select2-container {
+    width: 100% !important;
+}
+.form-select-wrapper select,.form-select-wrapper .select2-container--default .select2-selection--single {
+    border: 2px solid var(--primary-color);
+    outline: none;
+    width: 100%;
+    padding: 15px 10px;
+    height: auto;
+    border-radius: 0;
+}
+.form-select-wrapper .select2-container--default .select2-selection--single .select2-selection__rendered {
+    color: inherit;
+    line-height: inherit;
+}
+.form-select-wrapper .select2-container--default .select2-selection--single .select2-selection__arrow {
+    top: 50%;
+    transform: translateY(-50%);
+}
+.form-select-wrapper .select2-container--default .select2-selection--multiple  {
+    border: 2px solid var(--primary-color);
+    outline: none;
+    width: 100%;
+    padding: 10px 10px 15px 5px;
+    height: auto;
+    border-radius: 0;
+}
+.form-select-wrapper .select2-container--default .select2-selection--multiple .select2-selection__choice,
+.form-select-wrapper .select2-container--default .select2-selection--multiple .select2-selection__choice__remove {
+    border-color: var(--primary-color);
+    background-color: var(--btn-primary-opacity-color);
 }
 
 @media (max-width: 767px) {

@@ -5,13 +5,17 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Admin\Controller;
 use Illuminate\Http\Request;
 
-use App\Models\Route;
 use DB;
+use Validator;
+
+use App\Models\Route;
 
 class RouteController extends Controller
 {
     //
     protected $view_prefix = 'admin.routes.';
+    private $homeRoute = 'admin.routes';
+
     public $title = 'Routes';
 
     private function indexPageActions() {
@@ -87,30 +91,58 @@ class RouteController extends Controller
         return $this->view('index',compact('list','actions','controllers','methods','status','perPage'));
     }
 
-    public function add() {
+    public function add(Request $request) {
+
+        if($request->isMethod('POST')) {
+            $validator = self::validator($request);
+            if($validator->fails()) {
+                return back()->withErrors($validator)->withInput()->with(['msg' => 'Thêm định tuyến không thành công']);
+            }
+            $data = $request->all();
+            $item = Route::create($request->all());
+            return redirect()->route('admin.routes.edit',['id'=>$item->id])->with(['msg'=>'Thêm định tuyến thành công','type'=>'success']);
+        }
         $this->title = 'Thêm định tuyến';
         $this->heading = 'Thêm định tuyến';
         $breadcrumbs = [
             [
-                'title' => 'Định tuyến',
-                'link' => route('admin.routes.index'),
-            ]
+                'link' => route($this->homeRoute),
+                'title' => 'Định tuyến'
+            ],
         ];
         self::setBreadcrumb($breadcrumbs);
-        return $this->view('add');
+
+        $statusList = self::getStatusList();
+        $hiddenList = self::getHiddenList();
+
+        $treeRoute = Route::showTreeRoute();
+
+        return $this->view('add',compact('statusList','hiddenList','treeRoute'));
     }
 
     public function edit(Request $request) {
+        $itemid = $request->id;
+        $detail = Route::getDetailById($itemid);
+        if(!$detail) {
+            return redirect()->route('admin.routes')->with(['msg'=>'Định tuyến không tồn tại']);
+        }
+
         $this->title = 'Chỉnh sửa định tuyến';
         $this->heading = 'Chỉnh sửa định tuyến';
         $breadcrumbs = [
             [
-                'title' => 'Định tuyến',
-                'link' => route('admin.routes.index'),
-            ]
+                'link' => route($this->homeRoute),
+                'title' => 'Định tuyến'
+            ],
         ];
         self::setBreadcrumb($breadcrumbs);
-        return $this->view('add');
+        $statusList = self::getStatusList();
+        $hiddenList = self::getHiddenList();
+
+        $treeRoute = Route::showTreeRoute();
+
+
+        return $this->view('add',compact('statusList','hiddenList','treeRoute'));
     }
 
     public function delete(Request $request) {
@@ -122,6 +154,8 @@ class RouteController extends Controller
                 }
                 Route::deleteById($request->id);
                 Route::flushCache();
+                $request->session()->flash('msg','Xoá thành công');
+                $request->session()->flash('msg_type','success');
             }
             else {
                 abort(404,'Router không tồn tại');
@@ -149,6 +183,8 @@ class RouteController extends Controller
             }
             else {
                 $route->deleteByIds($ids,$where);
+                $request->session()->flash('msg','Xoá danh sách thành công');
+                $request->session()->flash('type','success');
             }
         }
         else {
@@ -174,6 +210,8 @@ class RouteController extends Controller
                 }
                 if($updated) {
                     $route->save();
+                    $request->session()->flash('msg','Cập nhật thành công');
+                    $request->session()->flash('type','success');
                     Route::flushCache();
                 }
             }
@@ -221,12 +259,11 @@ class RouteController extends Controller
                         case 'disabled_permission':
                             $query->update(['hidden'=>1]);
                             break;
-                        case 'delete':
-                            self::delete($request);
-                            break;
                         default:
                             abort(404,'Hành động không tồn tại');
                     }
+                    $request->session()->flash('msg','Cập nhật thành công');
+                    $request->session()->flash('type','success');
                     Route::flushCache();
                 }
                 else {
@@ -237,5 +274,84 @@ class RouteController extends Controller
         else {
             abort(404);
         }
+    }
+
+    function getHiddenList() {
+        return [
+            0 => "Cho phép phân quyền",
+            1 => "Ẩn phân quyền",
+        ];
+    }
+
+    function getStatusList() {
+        return [
+            0 => "Không hoạt động",
+            1 => "Hoạt động",
+        ];
+    }
+
+    function validator($request) {
+        $rules = [
+            'title' => 'required',
+            'uri' => 'required',
+            'controller' => ['required', function($attribte,$value,$fail) {
+                if(!in_array($value,listAdminController(true))) {
+                    $fail("Controller không tồn tại");
+                }
+            }],
+            'function' => ['required', function($attribte,$value,$fail) use ($request){
+                if($request->controller) {
+                    $controller = getAdminController($request->controller);
+                    if(!$controller) {
+                        return $fail("Function không tồn tại");
+                    }
+                    if(!method_exists($controller,$value)) {
+                        return $fail("Function không tồn tại");
+                    }
+                }
+                else {
+                    return $fail("Chưa chọn Controller");
+                }
+            }],
+            'method' => ['required', function($attribte,$value,$fail) {
+                $methods = routeMethods();
+                if(is_array($value)) {
+                    if(empty(array_filter($value))) {
+                        return $fail("Method không thể để trống");
+                    }
+                    $values = array_intersect($value,$methods);
+                    if(empty($values)) {
+                        return $fail("Method không tồn tại");
+                    }
+                }
+                elseif(!in_array($value,$methods)) {
+                    return $fail("Method không tồn tại");
+                }
+            }],
+            'parent_id' => [function($attribute,$value,$fail) {
+                $value = (int) $value;
+                if($value > 0) {
+                    $route = Route::getDetailById($value);
+                    if(!$route) {
+                        return $fail("Định tuyến không tồn tại");
+                    }
+                }
+            }],
+        ];
+
+        $messages = [
+            'required' => ':attribute không thể để trống'
+        ];
+
+        $attributes = [
+            'title' => 'Tên định tuyến',
+            'uri' => 'Đường dẫn',
+            'controller' => 'Controller',
+            'function' => 'Function',
+            'method' => 'Method',
+        ];
+
+        $validator = Validator::make($request->all(),$rules,$messages,$attributes);
+        return $validator;
     }
 }

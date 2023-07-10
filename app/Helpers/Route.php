@@ -24,15 +24,16 @@ function includeRoute($route) {
                 $prefix = substr($prefix,1);
             }
             $name = str_replace('/','.',$prefix);
+            $route->slug = $prefix;
+            setRoute($route);
             Route::prefix($prefix)->name($name.'.')->group(function() use($route) {
-                $route->uri = '/';
-                setRoute($route);
                 foreach($route->children as $chilren) {
                     includeRoute($chilren);
                 }
             });
         }
         else {
+            $route->slug = $route->function;
             setRoute($route);
         }
     }
@@ -43,14 +44,15 @@ function setRoute($route) {
         if($controller) {
             $methods = explode(',',$route->method);
             if(!$route->method) {
-                $set = Route::get($route->uri,[$controller,$route->function])->name($route->function);
+                $set = Route::get($route->uri,[$controller,$route->function]);
             }
             elseif(in_array('any',$methods)) {
-                $set = Route::any($route->uri,[$controller,$route->function])->name($route->function);
+                $set = Route::any($route->uri,[$controller,$route->function]);
             }
             else {
-                $set = Route::match($methods,$route->uri,[$controller,$route->function])->name($route->function);
+                $set = Route::match($methods,$route->uri,[$controller,$route->function]);
             }
+            $set = $set->name($route->slug);
             if($route->middleware) {
                 $set->middleware($route->middleware);
             }

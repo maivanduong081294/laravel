@@ -37,6 +37,12 @@
     ob_end_clean();
 @endphp
 
+@section('alert')
+    @if (session()->get('msg'))
+        <x-alert message="{{session()->get('msg')}}" type="{{session()->get('type')}}" />
+    @endif
+@endsection
+
 @section('content')
 <div class="result">
     <div class="data-heading">
@@ -63,7 +69,9 @@
                         <x-styles.button type="submit" content="Lọc" />
                     </div>
                 </div>
+                @if(!empty($list))
                 {{ $list->links() }}
+                @endif
             </div>
             <input type="hidden" name="orderBy" value="{{request()->orderBy}}">
             <input type="hidden" name="orderType" value="{{request()->orderType}}">
@@ -75,7 +83,7 @@
                 {!!$columns!!}
             </thead>
             <tbody>
-                @if($list->count()<=0)
+                @if(empty($list))
                 <tr>
                     <th colspan="8">Không có dữ liệu</th>
                 </tr>
@@ -114,7 +122,9 @@
                 <x-styles.button class="btn-handle-checkbox" content="Áp dụng" />
             </div>
         </div>
+        @if(!empty($list))
         {{ $list->links() }}
+        @endif
     </div>
 </div>
 @endsection

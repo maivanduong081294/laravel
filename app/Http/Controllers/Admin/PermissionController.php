@@ -38,7 +38,7 @@ class PermissionController extends Controller
                 'title' => 'Phân quyền'
             ],
         ]);
-        return $this->view('index');
+        return $this->view('add');
     }
 
     public function menu() {
@@ -89,5 +89,9 @@ class PermissionController extends Controller
             ];
         }
         return array_merge($beforeMenu,$menu,$afterMenu);
+    }
+
+    public function delete() {
+
     }
 }

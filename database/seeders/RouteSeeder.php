@@ -52,19 +52,6 @@ class RouteSeeder extends Seeder
         $controller = $data['controller'];
         $function = $data['function'];
         $method = isset($data['method'])?$data['method']:'GET';
-        if(isset($data['hidden'])) {
-            $hidden = $data['hidden']==1?1:0;
-        }
-        if(isset($data['super_admin'])) {
-            $super_admin = $data['super_admin']==1?1:0;
-        }
-        if(isset($data['parent_id'])) {
-            $parent_id = $data['parent_id'] > 0 ?$data['parent_id']:0;
-            $parentDetail = $route->where('id',$parent_id)->first();
-            if(!$parentDetail) {
-                $parent_id = 0;
-            }
-        }
 
         $initChildren = [];
         if((!isset($data['parent_id']) || $data['parent_id']==0) && isset($data['initChildren']) && $data['initChildren']> 0) {
@@ -97,52 +84,25 @@ class RouteSeeder extends Seeder
         }
         $children = !empty($data['children'])?array_merge($initChildren,$data['children']):$initChildren;
 
-        if(!empty($children)) {
-            $name = "admin.".strtolower($controller).".{$function}";
-        }
-        elseif(isset($parent_id) && $parent_id > 0) {
-            $name = str_replace($parentDetail->function,$function,$parentDetail->name);
-        }
-        else {
-            $name = "admin.{$function}";
-        }
-
         $item = $route->where('uri',$uri)->where('controller',$controller)->where('function',$function)->where('method',$method)->first();
         
         if(!$item) {
-            $route->title = $data['title'];
-            $route->name = $name;
-            $route->uri = $uri;
-            $route->controller =  $controller;
-            $route->function = $function;
-            $route->method = $method;
-            if(isset($hidden)) {
-                $route->hidden = $hidden;
-            }
-            if(isset($super_admin)) {
-                $route->super_admin = $super_admin;
-            }
-            if(isset($parent_id)) {
-                $route->parent_id = $parent_id;
-            }
-            $route->save();
-            $itemid = $route->id;
+            unset($data['initChildren']);
+            $item = $route->create($data);
+            $item = $route->find($item->id);
         }
-        else {
-            $itemid = $item->id;
-        }
-        if(!empty($children)) {
+        if($item && !empty($children)) {
             foreach($children as $routeChild) {
                 if(!isset($routeChild['controller'])) {
-                    $routeChild['controller'] = $controller;
+                    $routeChild['controller'] = $item->controller;
                 }
-                if(isset($hidden) && !isset($routeChild['hidden'])) {
-                    $routeChild['hidden'] = $hidden;
+                if(!isset($routeChild['hidden'])) {
+                    $routeChild['hidden'] = $item->hidden;
                 }
-                if(isset($super_admin) && !isset($routeChild['super_admin'])) {
-                    $routeChild['super_admin'] = $super_admin;
+                if(!isset($routeChild['super_admin'])) {
+                    $routeChild['super_admin'] = $item->super_admin;
                 }
-                $routeChild['parent_id'] = $itemid;
+                $routeChild['parent_id'] = $item->id;
                 self::insertData($routeChild);
             }
         }

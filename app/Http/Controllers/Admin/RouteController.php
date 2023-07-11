@@ -92,15 +92,16 @@ class RouteController extends Controller
     }
 
     public function add(Request $request) {
-
+        $route = new Route();
         if($request->isMethod('POST')) {
             $validator = self::validator($request);
             if($validator->fails()) {
                 return back()->withErrors($validator)->withInput()->with(['msg' => 'Thêm định tuyến không thành công']);
             }
             $data = $request->all();
-            $item = Route::create($request->all());
-            return redirect()->route('admin.routes.edit',['id'=>$item->id])->with(['msg'=>'Thêm định tuyến thành công','type'=>'success']);
+            $item = $route->create($request->all());
+            return 111;
+            //return redirect()->route('admin.routes.edit',['id'=>$item->id])->with(['msg'=>'Thêm định tuyến thành công','type'=>'success']);
         }
         $this->title = 'Thêm định tuyến';
         $this->heading = 'Thêm định tuyến';
@@ -121,10 +122,25 @@ class RouteController extends Controller
     }
 
     public function edit(Request $request) {
+        $route = new Route();
         $itemid = $request->id;
-        $detail = Route::getDetailById($itemid);
+        $detail = $route->getDetailById($itemid);
         if(!$detail) {
             return redirect()->route('admin.routes')->with(['msg'=>'Định tuyến không tồn tại']);
+        }
+
+        if($request->isMethod('POST')) {
+            $validator = self::validator($request);
+            if($validator->fails()) {
+                return back()->withErrors($validator)->withInput()->with(['msg'=>'Cập nhật không thành công']);
+            }
+            $result = $route->updateById($request->id,$request->all());
+            if($result) {
+                return back()->with(['msg'=>'Cập nhật thành công','type'=>'success']);
+            }
+            else {
+                return back()->withErrors($validator)->withInput()->with(['msg'=>'Cập nhật không thành công']);
+            }
         }
 
         $this->title = 'Chỉnh sửa định tuyến';
@@ -139,10 +155,10 @@ class RouteController extends Controller
         $statusList = self::getStatusList();
         $hiddenList = self::getHiddenList();
 
-        $treeRoute = Route::showTreeRoute();
+        $treeRoute = Route::showTreeRoute($detail->id);
 
 
-        return $this->view('add',compact('statusList','hiddenList','treeRoute'));
+        return $this->view('edit',compact('statusList','hiddenList','treeRoute','detail'));
     }
 
     public function delete(Request $request) {
@@ -155,7 +171,7 @@ class RouteController extends Controller
                 Route::deleteById($request->id);
                 Route::flushCache();
                 $request->session()->flash('msg','Xoá thành công');
-                $request->session()->flash('msg_type','success');
+                $request->session()->flash('type','success');
             }
             else {
                 abort(404,'Router không tồn tại');
@@ -262,7 +278,7 @@ class RouteController extends Controller
                         default:
                             abort(404,'Hành động không tồn tại');
                     }
-                    $request->session()->flash('msg','Cập nhật thành công');
+                    $request->session()->flash('msg','Cập nhật danh sách thành công');
                     $request->session()->flash('type','success');
                     Route::flushCache();
                 }
@@ -328,12 +344,19 @@ class RouteController extends Controller
                     return $fail("Method không tồn tại");
                 }
             }],
-            'parent_id' => [function($attribute,$value,$fail) {
+            'parent_id' => [function($attribute,$value,$fail) use($request) {
                 $value = (int) $value;
                 if($value > 0) {
                     $route = Route::getDetailById($value);
                     if(!$route) {
                         return $fail("Định tuyến không tồn tại");
+                    }
+                    if($request->id) {
+                        $route = new Route();
+                        $children = $route->getChildrenRoutesIds($request->id);
+                        if(!empty($children) && in_array($value,$children)) {
+                            return $fail("Không thể chọn định tuyến con để phụ thuộc");
+                        }
                     }
                 }
             }],

@@ -207,9 +207,12 @@ class BaseModel extends Model
     }
 
     public function deleteById($id) {
-        self::where('id',$id)->delete();
-        self::flushCache();
-        return true;
+        $result = self::where('id',$id)->delete();
+        if($result) {
+            self::flushCache();
+            return true;
+        }
+        return false;
     }
 
     public function deleteByIds(array $ids,Array $where=[]) {
@@ -218,8 +221,47 @@ class BaseModel extends Model
         }
         $query = self::select();
         $query = self::setWhere($query,$where);
-        $query->whereIn('id',$ids)->delete();
-        self::flushCache();
-        return true;
+        $result = $query->whereIn('id',$ids)->delete();
+        if($result) {
+            self::flushCache();
+            return true;
+        }
+        return false;
+    }
+
+    public function create($data) {
+        $data = $this->filterData($data);
+        $result = parent::create($data);
+        if($result) {
+            $this->flushCache();
+            return $result;
+        }
+        return false;
+    }
+
+    public function updateById($id,$data) {
+        $data = $this->filterData($data);
+        $result = self::where('id',$id)->update($data);
+        if($result) {
+            $this->flushCache();
+            return true;
+        }
+        return false;
+    }
+
+    public function filterData($data) {
+        $fillable = self::getFillable();
+        $newData = [];
+        foreach($fillable as $fill) {
+            if(isset($data[$fill])) {
+                if(is_array($data[$fill])) {
+                    $newData[$fill] = implode(',',$data[$fill]);
+                }
+                else {
+                    $newData[$fill] = $data[$fill];
+                }
+            }
+        }
+        return $newData;
     }
 }

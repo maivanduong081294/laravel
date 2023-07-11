@@ -1,24 +1,29 @@
 @if ($values)
 <div {!! $attrs !!}>
     @if($label)
-    <label class="form-input-label" for="{{$id}}">{{$label}}</label>
-    @endif
-    <div class="form-select-wrapper">
-        <select {!! $selectAttrs !!}>
-            @if ($default)
-                <option value="">{{$default}}</option>
-            @endif
-            @foreach($values as $key=>$value)
-                @php
-                    $key = $keyByValue ? $value : $key;
-                @endphp
-                <option value="{{$key}}" {{in_array($key,$selected)?" selected":"" }}>{{$value}}</option>
-            @endforeach
-        </select>
+    <div class="form-field-heading">
+        <label class="form-field-label" for="{{$id}}">{{$label}}</label>
     </div>
+    @endif
 
-    @error($name)
-        <span class="form-input-error">{{$message}}</span>
-    @enderror
+    <div class="form-field-body">
+        <div class="form-select-wrapper">
+            <select {!! $selectAttrs !!}>
+                @if ($default)
+                    <option value="">{{$default}}</option>
+                @endif
+                @foreach($values as $key=>$value)
+                    @php
+                        $key = $keyByValue ? $value : $key;
+                    @endphp
+                    <option value="{{$key}}" {{in_array($key,$selected)?" selected":"" }}>{{$value}}</option>
+                @endforeach
+            </select>
+        </div>
+
+        @error($name)
+            <span class="form-field-error">{{$message}}</span>
+        @enderror
+    </div>
 </div>
 @endif

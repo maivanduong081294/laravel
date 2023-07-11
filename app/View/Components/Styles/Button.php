@@ -11,8 +11,8 @@ class Button extends Component
      *
      * @return void
      */
-    public $content,$attrs,$comp;
-    public function __construct($content,$onclick="",$class="",$id="",$href="",$target="",$type="")
+    public $content,$attrs,$comp,$leftIcon,$rightIcon;
+    public function __construct($content,$onclick="",$class="",$id="",$href="",$target="",$type="",$leftIcon="",$rightIcon="")
     {
         //
         $attributes = [
@@ -34,6 +34,8 @@ class Button extends Component
         $this->attrs = setComponentAttributes($attributes);
         $this->content = $content;
         $this->comp = $comp;
+        $this->leftIcon = $leftIcon;
+        $this->rightIcon = $rightIcon;
     }
 
     /**

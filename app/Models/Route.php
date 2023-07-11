@@ -3,18 +3,21 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Builder;
 
 class Route extends BaseModel
 {
     use HasFactory;
 
     protected $fillable = [
-        'title','as','uri', 'controller', 'function', 'middleware','status','hidden','super_admin','name','parent_id',
+        'title','as','uri', 'controller', 'function', 'middleware','status','hidden','super_admin','name','parent_id','method'
     ];
 
     protected $attribtes = [
         "status" => 1,
         "super_admin" => 0,
+        "parent_id" => 0,
+        "hidden" => 0,
     ];
 
     public function getList(array $where = [], array $orderBy = []) {
@@ -86,6 +89,33 @@ class Route extends BaseModel
         return $value;
     }
 
+    public function getChildrenRoutesIds($id,$ids=[]) {
+        $keyCache = __FUNCTION__.'-'.$id.'-'.implode(',',$ids);
+        $value = self::getCache($keyCache);
+        if(!self::hasCache($keyCache)) {
+            $where = [
+                ['status',1],
+                ['parent_id',$id]
+            ];
+            $order = [
+                [
+                    'orderBy' => 'title',
+                    'orderType' => 'ASC',
+                ]
+            ];
+            $routes = parent::getAllList($where,$order);
+            if($routes) {
+                foreach($routes as $route) {
+                    $ids[] = $route->id;
+                    $ids = self::getChildrenRoutesIds($route->id,$ids);
+                }
+            }
+            $value = $ids;
+            self::setCache($keyCache,$value);
+        }
+        return $value;
+    }
+
     public function getControllers() {
         $keyCache = __FUNCTION__;
         $value = self::getCache($keyCache);
@@ -148,11 +178,14 @@ class Route extends BaseModel
         return $parents;
     }
 
-    public function create($data) {
+    public function filterData($data) {
+        if(is_array($data['method'])) {
+            $data['method'] = implode(',',$data['method']);
+        }
         if(isset($data['parent_id']) && $data['parent_id'] > 0) {
             $parentDetail = self::getDetailById($data['parent_id']);
             if($parentDetail) {
-                if($parentDetail->function == 'index') {
+                if($data['function'] == 'index') {
                     $data['name'] = str_replace($parentDetail->function,$data['function'],$parentDetail->name);
                 }
                 else {
@@ -161,10 +194,8 @@ class Route extends BaseModel
             }
         }
         else {
-            $data['name'] = 'admin.'.$data['function'];
+            $data['name'] = 'admin.'.strtolower($data['controller']);
         }
-        $result = parent::create($data);
-        self::flushCache();
-        return $result;
+        return parent::filterData($data);
     }
 }

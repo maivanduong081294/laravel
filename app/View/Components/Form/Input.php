@@ -13,12 +13,15 @@ class Input extends Component
      */
 
     public $name,$id,$label,$icon,$attrs,$inputAttrs;
-    public function __construct($name,$value='',$type='text',$placeholder='',$label='',$id='',$icon='',$class='',$onchange='',$inputClass="")
+    public function __construct($name,$value='',$type='text',$placeholder='',$label='',$id='',$icon='',$class='',$onchange='',$inputClass="",$readonly="")
     {
         //
 
         if($placeholder == 'true') {
             $placeholder = trim($label)?trim($label):"";
+        }
+        if($readonly != 'true') {
+            $readonly = "";
         }
         $inputAttrs = [
             'class' => $inputClass,
@@ -28,10 +31,11 @@ class Input extends Component
             'value' => $value,
             'placeholder' => $placeholder,
             'name' => $name,
+            'readonly' => $readonly,
         ];
 
         $attrs = [
-            'class' => 'form-input '.$class,
+            'class' => 'form-field '.$class,
         ];
         $this->name = $name;
         $this->label = $label;

@@ -16,7 +16,7 @@ class Select extends Component
     {
         //
         $attributes = [
-            'class' => 'form-input '.$class,
+            'class' => 'form-field '.$class,
         ];
 
         if($placeholder == 'true') {

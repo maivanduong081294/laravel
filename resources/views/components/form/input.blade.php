@@ -1,16 +1,20 @@
 <div {!! $attrs !!}>
     @if($label)
-    <label class="form-input-label" for="{{$id}}">{{$label}}</label>
-    @endif
-    <div class="form-input-wrapper">
-        <input {!! $inputAttrs !!}>
-        @if($icon)
-        <div class="form-input-icon">
-            {!!$icon!!}
-        </div>
-        @endif
+    <div class="form-field-heading">
+        <label class="form-field-label" for="{{$id}}">{{$label}}</label>
     </div>
-    @error($name)
-        <span class="form-input-error">{{$message}}</span>
-    @enderror
+    @endif
+    <div class="form-field-body">
+        <div class="form-input-wrapper">
+            <input {!! $inputAttrs !!}>
+            @if($icon)
+            <div class="form-input-icon">
+                {!!$icon!!}
+            </div>
+            @endif
+        </div>
+        @error($name)
+            <span class="form-field-error">{{$message}}</span>
+        @enderror
+    </div>
 </div>

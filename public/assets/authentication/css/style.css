@@ -66,7 +66,7 @@ h2 {
 	margin-bottom: 30px;
 	text-transform: uppercase;
 }
-.form-input {
+.form-field {
 	text-align: left;
 	margin-bottom: 20px;
 }
@@ -76,7 +76,7 @@ h2 {
 	display: flex;
 	align-items: center;
 }
-.form-input-label {
+.form-field-label {
     text-align: left;
     margin-bottom: 10px;
     display: inline-block;
@@ -84,21 +84,21 @@ h2 {
 .form-input-icon {
     margin-left: 10px;
 }
-.form-input-error {
+.form-field-error {
     color: #ff0000;
     margin-top: 5px;
     display: inline-block;
 }
-.form-input.form-input-check label {
+.form-field.form-input-check label {
 	display: flex;
 	align-items: center;
 	cursor: pointer;
 	margin: 0;
 }
-.form-input.form-input-check label input[type="checkbox"] {
+.form-field.form-input-check label input[type="checkbox"] {
 	display: none;
 }
-.form-input.form-input-check label span {
+.form-field.form-input-check label span {
     width: 15px;
     height: 15px;
     display: inline-flex;
@@ -106,7 +106,7 @@ h2 {
     border: 2px solid var(--primary-color);
     margin-right: 8px;
 }
-.form-input.form-input-check label input[type="checkbox"]:checked + span::before {
+.form-field.form-input-check label input[type="checkbox"]:checked + span::before {
     border-color: #fff;
     content: "\f00c";
     font-family: 'FontAwesome';

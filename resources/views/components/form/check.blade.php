@@ -1,8 +1,12 @@
-<div class="form-input form-input-check">
-    <label class="form-input-label" for="{{$id}}">
-        <input type="checkbox" id="{{$id}}" {{$checked!='false'?' checked':''}} name="{{$name}}" value="{{$value}}"><span></span>{{$label}}
-    </label>
-    @error($name)
-        <span class="form-input-error">{{$message}}</span>
-    @enderror
+<div {!!$attrs!!}>
+    <div class="form-field-heading">
+        <label class="form-field-label" for="{{$id}}">
+            <input {!!$inputAttrs!!} /><span></span>{{$label}}
+        </label>
+    </div>
+    <div class="form-field-body">
+        @error($name)
+            <span class="form-field-error">{{$message}}</span>
+        @enderror
+    </div>
 </div>

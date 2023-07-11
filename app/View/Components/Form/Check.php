@@ -12,15 +12,30 @@ class Check extends Component
      * @return void
      */
 
-    public $value,$name,$id,$label,$checked;
-    public function __construct($value='',$name,$id,$label,$checked=false)
+    public $id,$label,$attrs,$inputAttrs,$name;
+    public function __construct($value='',$name,$id,$label,$checked=false,$type='checkbox',$readonly='',$class='')
     {
-        $checked = $checked==='true'?true:false;
-        $this->value = $value;
-        $this->name = $name;
+        $type = $type==='radio'?'radio':'checkbox';
+        $checked = $checked==='true'?'true':'';
+        $readonly = $readonly != 'true'?"true":'';
+
+        $inputAttrs = [
+            'type' => $type,
+            'id' => $id,
+            'value' => $value,
+            'name' => $name,
+            'readonly' => $readonly,
+        ];
+
+        $attrs = [
+            'class'=> 'form-field form-input-check '.$class,
+        ];
+        
         $this->id = $id;
+        $this->name = $name;
         $this->label = $label;
-        $this->checked = $checked;
+        $this->attrs = setComponentAttributes($attrs);
+        $this->inputAttrs = setComponentAttributes($inputAttrs);
     }
 
     /**

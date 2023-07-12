@@ -33,89 +33,6 @@ class Route extends BaseModel
         return parent::getList($where,$orderBy);
     }
 
-    public function getTreeRoutes() {
-        $keyCache = __FUNCTION__;
-        $value = self::getCache($keyCache);
-        if(!self::hasCache($keyCache)) {
-            $where = [
-                ['status',1],
-                ['parent_id',0]
-            ];
-            $order = [
-                [
-                    'orderBy' => 'title',
-                    'orderType' => 'ASC',
-                ]
-            ];
-            $routes = parent::getAllList($where,$order);
-            if($routes) {
-                $newRoutes = [];
-                foreach($routes as $route) {
-                    $route->children = self::getChildrenRoutes($route->id);
-                    $newRoutes[] = $route;
-                }
-                $value = $newRoutes;
-            }
-            self::setCache($keyCache,$value);
-        }
-        return $value;
-    }
-
-    public function getChildrenRoutes($id) {
-        $keyCache = __FUNCTION__.'-'.$id;
-        $value = self::getCache($keyCache);
-        if(!self::hasCache($keyCache)) {
-            $where = [
-                ['status',1],
-                ['parent_id',$id]
-            ];
-            $order = [
-                [
-                    'orderBy' => 'title',
-                    'orderType' => 'ASC',
-                ]
-            ];
-            $routes = parent::getAllList($where,$order);
-            if($routes) {
-                $newRoutes = [];
-                foreach($routes as $route) {
-                    $route->children = self::getChildrenRoutes($route->id);
-                    $newRoutes[] = $route;
-                }
-                $value = $newRoutes;
-            }
-            self::setCache($keyCache,$value);
-        }
-        return $value;
-    }
-
-    public function getChildrenRoutesIds($id,$ids=[]) {
-        $keyCache = __FUNCTION__.'-'.$id.'-'.implode(',',$ids);
-        $value = self::getCache($keyCache);
-        if(!self::hasCache($keyCache)) {
-            $where = [
-                ['status',1],
-                ['parent_id',$id]
-            ];
-            $order = [
-                [
-                    'orderBy' => 'title',
-                    'orderType' => 'ASC',
-                ]
-            ];
-            $routes = parent::getAllList($where,$order);
-            if($routes) {
-                foreach($routes as $route) {
-                    $ids[] = $route->id;
-                    $ids = self::getChildrenRoutesIds($route->id,$ids);
-                }
-            }
-            $value = $ids;
-            self::setCache($keyCache,$value);
-        }
-        return $value;
-    }
-
     public function getControllers() {
         $keyCache = __FUNCTION__;
         $value = self::getCache($keyCache);
@@ -142,45 +59,26 @@ class Route extends BaseModel
         return $value;
     }
 
-    public function showTreeRoute($ids=[], $parents=[], $parent_route = [],$prefix='') {
-        if(empty($parent_route)) {
-            $routes = Route::getTreeRoutes();
-        }
-        else {
-            $routes = null;
-            $route = $parent_route;
-        }
-        if(is_array($routes)) {
-            foreach($routes as $route) {
-                if(((is_array($ids) && in_array($route->id,$ids)) || $ids == $route->id)) {
-                    continue;
-                }
-                $parents[$route->id] = $route->title;
-                if(!empty($route->children)) {
-                    foreach($route->children as $child) {
-                        $parents = self::showTreeRoute($ids, $parents, $child);
-                    }
-                }
-            }
-        }
-        else {
-            if(((is_array($ids) && in_array($route->id,$ids)) || $ids == $route->id)) {
-                return $parents;
-            }
-            $prefix=$prefix.'---';
-            $parents[$route->id] = $prefix.' '.$route->title;
-            if($route->children) {
-                foreach($route->children as $child) {
-                    $parents = self::showTreeRoute($ids, $parents, $child, $prefix);
-                }
-            }
-        }
-        return $parents;
-    }
-
     public function filterData($data) {
-        if(is_array($data['method'])) {
-            $data['method'] = implode(',',$data['method']);
+        if(isset($data['method'])) {
+            $methods = routeMethods();
+            $method = $data['method'];
+            if(!is_array($method) && trim($method)) {
+                $method = explode(',',$method);
+            }
+            if(is_array($method)) {
+                $method = array_intersect($method,$methods);
+                if(!empty($method)) {
+                    $method = implode(',',$method);
+                }
+                else {
+                    $method = '';
+                }
+            }
+            else {
+                $method = '';
+            }
+            $data['method'] = $method;
         }
         if(isset($data['parent_id']) && $data['parent_id'] > 0) {
             $parentDetail = self::getDetailById($data['parent_id']);

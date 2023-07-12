@@ -1,4 +1,4 @@
-@if ($values)
+
 <div {!! $attrs !!}>
     @if($label)
     <div class="form-field-heading">
@@ -12,12 +12,14 @@
                 @if ($default)
                     <option value="">{{$default}}</option>
                 @endif
-                @foreach($values as $key=>$value)
-                    @php
-                        $key = $keyByValue ? $value : $key;
-                    @endphp
-                    <option value="{{$key}}" {{in_array($key,$selected)?" selected":"" }}>{{$value}}</option>
-                @endforeach
+                @if ($values)
+                    @foreach($values as $key=>$value)
+                        @php
+                            $key = $keyByValue ? $value : $key;
+                        @endphp
+                        <option value="{{$key}}" {{in_array($key,$selected)?" selected":"" }}>{{$value}}</option>
+                    @endforeach
+                @endif
             </select>
         </div>
 
@@ -26,4 +28,3 @@
         @enderror
     </div>
 </div>
-@endif

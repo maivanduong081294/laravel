@@ -22,13 +22,10 @@ $(document).ready(function() {
     });
     $('.select2').each(function() {
         var $this = $(this);
-        var attributes = {
-            width: "resolve",
-            closeOnSelect: false,
-            allowClear: true
-        };
+        var attributes = {};
         if($this.hasClass('multiple')) {
             attributes.multiple = true;
+            attributes.allowClear = true;
         }
         if($this.data('placeholder')) {
             attributes.placeholder = $this.data('placeholder');

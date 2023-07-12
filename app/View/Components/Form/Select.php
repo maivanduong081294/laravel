@@ -45,6 +45,7 @@ class Select extends Component
             'name' => $name,
             'data-placeholder' => $placeholder,
             'multiple' => $multiple,
+            'aria-labelledby' => $name,
         ];
 
         if(strpos($name,"[")!==false) {

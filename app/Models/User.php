@@ -55,6 +55,8 @@ CanResetPasswordContract
     
     protected $redirectTo = '/admin';
 
+    protected $nameCol = 'fullname';
+
     public function login($username,$password,$remember=false) {
         $usernameLogin = [
             'username' => $username,

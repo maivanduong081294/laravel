@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\Schema;
 function getAdminRoute() {
     if(Schema::hasTable('routes')) {
         $route = new RouteModel();
-        $routes = $route->getTreeRoutes();
+        $routes = $route->getTree();
         if(!empty($routes)) {
             foreach($routes as $route) {
                 includeRoute($route);

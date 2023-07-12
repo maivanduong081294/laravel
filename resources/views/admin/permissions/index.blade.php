@@ -9,7 +9,7 @@
 @endsection
 
 @section('heading-after')
-    <x-styles.button href="{{route('admin.routes.add')}}" content="Thêm mới"/>
+    <x-styles.button href="{{route('admin.permissions.add')}}" content="Thêm mới"/>
 @endsection
 
 @section('breadcrumb')
@@ -21,6 +21,13 @@
 @endphp
 <tr>
     <th class="text-center"><x-styles.checkbox type="checkbox" input-class="check-list-all"/></th>
+    <x-styles.th order-by="name" text="Tên phân quyền"/>
+    <x-styles.th text="Icon"/>
+    <x-styles.th text="Link"/>
+    <x-styles.th text="Nhóm"/>
+    <x-styles.th order-by="hidden" text="Hiển thị Menu"/>
+    <x-styles.th order-by="status" text="Trạng thái"/>
+    <x-styles.th text=""/>
 </tr>
 @php
     $columns = ob_get_contents();
@@ -49,15 +56,17 @@
             </div>
             <div class="data-heading-bottom">
                 <div class="data-heading-actions">
-                    {{-- <div class="data-heading-handle-checkbox handle-checkbox">
+                    <div class="data-heading-handle-checkbox handle-checkbox">
                         <x-styles.select class="list-handle-checkbox" default="Hành động" values="{{json_encode($actions)}}"/>
                         <x-styles.button class="btn-handle-checkbox" content="Áp dụng" />
-                    </div> --}}
-                    {{-- <div class="data-heading-filter">
-                        <x-styles.select default="Controllers" name="controller" selected="{{request()->controller}}" key-by-value="1" values="{{json_encode($controllers)}}"/>
-                        <x-styles.select default="Methods" name="getMethod" selected="{{request()->getMethod}}" key-by-value="1" values="{{json_encode($methods)}}"/>
+                    </div>
+                    <div class="data-heading-filter">
+                        {{-- <x-styles.select default="Nhóm người dùng" name="group" selected="{{request()->getMethod}}" values="{{json_encode($listGroup)}}"/> --}}
+                        <x-styles.select default="Nhóm người dùng" name="group" selected="{{request()->getMethod}}" values="{{json_encode($listGroup)}}"/>
+                        <x-styles.select default="Trạng thái" name="status" selected="{{request()->status}}" values="{{json_encode($listStatus)}}"/>
+                        <x-styles.select default="Menu" name="hidden" selected="{{request()->hidden}}" values="{{json_encode($listHidden)}}"/>
                         <x-styles.button type="submit" content="Lọc" />
-                    </div> --}}
+                    </div>
                 </div>
                 @if(!empty($list))
                 {{ $list->links() }}
@@ -94,8 +103,8 @@
     <div class="data-foot">
         <div class="data-foot-actions">
             <div class="data-foot-handle-checkbox handle-checkbox">
-                {{-- <x-styles.select class="list-handle-checkbox" default="Hành động" values="{{json_encode($actions)}}"/>
-                <x-styles.button class="btn-handle-checkbox" content="Áp dụng" /> --}}
+                <x-styles.select class="list-handle-checkbox" default="Hành động" values="{{json_encode($actions)}}"/>
+                <x-styles.button class="btn-handle-checkbox" content="Áp dụng" />
             </div>
         </div>       
         @if(!empty($list))
@@ -107,7 +116,7 @@
 
 @section('js')
     <script>
-        ajaxUpdateUrl = {!! json_encode(route('admin.routes.update')) !!}
-        ajaxDeleteUrl = {!! json_encode(route('admin.routes.delete')) !!}
+        ajaxUpdateUrl = {!! json_encode(route('admin.permissions.update')) !!}
+        ajaxDeleteUrl = {!! json_encode(route('admin.permissions.delete')) !!}
     </script>
 @endsection

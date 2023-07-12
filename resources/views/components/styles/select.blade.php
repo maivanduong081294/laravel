@@ -5,9 +5,9 @@
         @endif
         @foreach($values as $key=>$value)
             @php
-                $key = $keyByValue ? $value : $key;
+                $key = (string) ($keyByValue ? $value : $key);
             @endphp
-            <option value="{{$key}}" {{$selected == $key?" selected":"" }}>{{$value}}</option>
+            <option value="{{$key}}" {{$selected === $key?" selected":"" }}>{{$value}}</option>
         @endforeach
     </select>
 @endif

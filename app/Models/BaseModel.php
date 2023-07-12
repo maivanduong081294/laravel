@@ -12,6 +12,8 @@ class BaseModel extends Model
     public $orderBy = 'id';
     public $orderType = 'DESC';
 
+    protected $nameCol = 'title';
+
     public function __construct(Array $attributes = []) {
         if(!in_array(self::getPerPage(), listShowItemsNumber())) {
             self::setPerPage(session('perPage',20));
@@ -47,56 +49,77 @@ class BaseModel extends Model
         return parent::setPerPage($number);
     }
 
-    public function setWhere($query,$where) {
+    public function setWhere($query,$where,$orWhere = false,$group = false) {
+        $from = $query->getQuery()->from;
+        $method = $orWhere==false?'where':'orWhere';
+        $methodRaw = $orWhere==false?'whereRaw':'orWhereRaw';
+        $otherMethod = $method=='where'?'orWhere':'where';
         if(!empty($where)) {
             foreach($where as $key => $item) {
                 if(is_array($item)) {
-                    if(is_array($item[0])) {
-                        $query->where(function ($query) use ($item) {
-                            $i = 0;
-                            foreach($item as $sub) {
-                                if($i == 0) {
-                                    if(count($sub) === 3) {
-                                        $query->where($sub[0],$sub[1],$sub[2]);
-                                    }
-                                    elseif(count($sub) === 2) {
-                                        $query->where($sub[0],$sub[1]);
-                                    }
-                                }
-                                else {
-                                    if(count($sub) === 3) {
-                                        $query->orWhere($sub[0],$sub[1],$sub[2]);
-                                    }
-                                    elseif(count($sub) === 2) {
-                                        $query->orWhere($sub[0],$sub[1]);
-                                    }
-                                }
-                                $i++;
-                            }
+                    if($group) {
+                        $query->$method(function ($query) use ($where,$orWhere) {
+                            $newOrWhere = $orWhere?false:true;
+                            $query = self::setWhere($query,$where,$newOrWhere);
                         });
+                        break;
                     }
                     else {
-                        if(count($item) === 3) {
-                            $query->where($item[0],$item[1],$item[2]);
+                        $check = false;
+                        foreach($item as $keyChild => $child) {
+                            if($keyChild === 'raw') {
+                                $query->$methodRaw($child[0],$child[1]);
+                                $check = true;
+                            }
+                            elseif($keyChild === 'or') {
+                                $check = true;
+                                $query = self::setWhere($query,$child,true,true);
+                                break;
+                            }
                         }
-                        elseif(count($item) === 2) {
-                            $query->where($item[0],$item[1]);
+                        if($check == false && count($where) > 1) {
+                            if(isset($item[0]) && is_array($item[0])) {
+                                $query->$method(function ($query) use ($item,$method,$otherMethod) {
+                                    $i = 0;
+                                    foreach($item as $sub) {
+                                        if($i == 0) {
+                                            if(count($sub) === 3) {
+                                                $query->$method($sub[0],$sub[1],$sub[2]);
+                                            }
+                                            elseif(count($sub) === 2) {
+                                                $query->$method($sub[0],$sub[1]);
+                                            }
+                                        }
+                                        else {
+                                            if(count($sub) === 3) {
+                                                $query->$otherMethod($sub[0],$sub[1],$sub[2]);
+                                            }
+                                            elseif(count($sub) === 2) {
+                                                $query->$otherMethod($sub[0],$sub[1]);
+                                            }
+                                        }
+                                        $i++;
+                                    }
+                                });
+                            }
+                            else {
+                                $query = self::setWhere($query,$item,$orWhere);
+                            }
                         }
                     }
                 }
                 else {
-                    if($key != 0) {
-                        $query->where($key,$item);
+                    if($key !== 0) {
+                        $query->$method($key,$item);
+                        break;
                     }
-                    else {
-                        if(count($where) === 3) {
-                            $query->where($where[0],$where[1],$where[2]);
-                            break;
-                        }
-                        elseif(count($where) === 2) {
-                            $query->where($where[0],$where[1]);
-                            break;
-                        }
+                    if(count($where) === 3) {
+                        $query->$method($where[0],$where[1],$where[2]);
+                        break;
+                    }
+                    elseif(count($where) === 2) {
+                        $query->$method($where[0],$where[1]);
+                        break;
                     }
                 }
             }
@@ -263,5 +286,114 @@ class BaseModel extends Model
             }
         }
         return $newData;
+    }
+
+    public function getTree($where = []) {
+        $keyCache = __FUNCTION__.'-'.json_encode($where);
+        $value = self::getCache($keyCache);
+        if(!self::hasCache($keyCache)) {
+            $where = array_merge([
+                ['status',1],
+                ['parent_id',0]
+            ], $where);
+            $results = self::getAllList($where);
+            if($results) {
+                $data = [];
+                foreach($results as $item) {
+                    $item->children = self::getChildren($item->id);
+                    $data[] = $item;
+                }
+                $value = $data;
+            }
+            self::setCache($keyCache,$value);
+        }
+        return $value;
+    }
+
+    public function getChildren($id) {
+        $keyCache = __FUNCTION__.'-'.$id;
+        $value = self::getCache($keyCache);
+        if(!self::hasCache($keyCache)) {
+            $where = [
+                ['status',1],
+                ['parent_id',$id]
+            ];
+            $results = self::getAllList($where);
+            if($results) {
+                $data = [];
+                foreach($results as $item) {
+                    $item->children = self::getChildren($item->id);
+                    $data[] = $item;
+                }
+                $value = $data;
+            }
+            self::setCache($keyCache,$value);
+        }
+        return $value;
+    }
+
+    public function getChildrenIds($id,$ids=[]) {
+        $keyCache = __FUNCTION__.'-'.$id.'-'.implode(',',$ids);
+        $value = self::getCache($keyCache);
+        if(!self::hasCache($keyCache)) {
+            $where = [
+                ['status',1],
+                ['parent_id',$id]
+            ];
+            $results = self::getAllList($where);
+            if($results) {
+                foreach($results as $item) {
+                    $ids[] = $item->id;
+                    $ids = self::getChildrenIds($item->id,$ids);
+                }
+            }
+            $value = $ids;
+            self::setCache($keyCache,$value);
+        }
+        return $value;
+    }
+
+    public function showTree($ids=[],$where=[], $parents=[], $parent_route = [],$prefix='') {
+        $key = $this->nameCol;
+        $keyCache = __FUNCTION__.json_encode($ids).'-'.$key.'-'.json_encode($where).'-'.json_encode($parents).json_encode($parent_route).'-'.$prefix;
+        $value = self::getCache($keyCache);
+        if(!self::hasCache($keyCache)) {
+            if(empty($parent_route)) {
+                $result = self::getTree($where);
+                $item = '';
+            }
+            else {
+                $result = null;
+                $item = $parent_route;
+            }
+            if(is_array($result)) {
+                foreach($result as $item) {
+                    if(((is_array($ids) && in_array($item->id,$ids)) || $ids == $item->id)) {
+                        continue;
+                    }
+                    $parents[$item->id] = $item->$key;
+                    if(!empty($item->children)) {
+                        foreach($item->children as $child) {
+                            $parents = self::showTree($ids,$where, $parents, $child);
+                        }
+                    }
+                }
+            }
+            elseif($item) {
+                if(((is_array($ids) && in_array($item->id,$ids)) || $ids == $item->id)) {
+                    return $parents;
+                }
+                $prefix=$prefix.'---';
+                $parents[$item->id] = $prefix.' '.$item->$key;
+                if($item->children) {
+                    foreach($item->children as $child) {
+                        $parents = self::showTree($ids,$where, $parents, $child, $prefix);
+                    }
+                }
+            }
+            $value = $parents;
+            self::setCache($keyCache,$value);
+        }
+        return $value;
     }
 }

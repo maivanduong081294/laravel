@@ -23,4 +23,6 @@ class Permission extends BaseModel
         "status" => 0,
         "hidden" => 0,
     ];
+
+    protected $nameCol = 'name';
 }

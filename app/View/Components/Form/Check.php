@@ -25,6 +25,7 @@ class Check extends Component
             'value' => $value,
             'name' => $name,
             'readonly' => $readonly,
+            'aria-labelledby' => $name,
         ];
 
         $attrs = [

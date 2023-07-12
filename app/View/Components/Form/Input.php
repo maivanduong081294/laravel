@@ -32,6 +32,7 @@ class Input extends Component
             'placeholder' => $placeholder,
             'name' => $name,
             'readonly' => $readonly,
+            'aria-labelledby' => $name,
         ];
 
         $attrs = [

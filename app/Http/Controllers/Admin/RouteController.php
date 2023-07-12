@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Admin\Controller;
 use Illuminate\Http\Request;
 
-use DB;
 use Validator;
 
 use App\Models\Route;
@@ -27,6 +26,7 @@ class RouteController extends Controller
             'delete' => 'Xoá định tuyến',
         ];
     }
+
     public function index(Request $request) {
         $this->title = 'Danh sách định tuyến';
         $this->heading = 'Danh sách định tuyến';
@@ -116,7 +116,7 @@ class RouteController extends Controller
         $statusList = self::getStatusList();
         $hiddenList = self::getHiddenList();
 
-        $treeRoute = Route::showTreeRoute();
+        $treeRoute = $route->showTree();
 
         return $this->view('add',compact('statusList','hiddenList','treeRoute'));
     }
@@ -155,8 +155,7 @@ class RouteController extends Controller
         $statusList = self::getStatusList();
         $hiddenList = self::getHiddenList();
 
-        $treeRoute = Route::showTreeRoute($detail->id);
-
+        $treeRoute = $route->showTree($detail->id);
 
         return $this->view('edit',compact('statusList','hiddenList','treeRoute','detail'));
     }
@@ -259,7 +258,6 @@ class RouteController extends Controller
             else {
                 if($request->has('action')) {
                     $action = $request->action;
-                    DB::enableQueryLog();
                     $query = Route::whereIn('id',$ids);
                     $query = Route::setWhere($query,$where);
                     switch($action) {
@@ -353,7 +351,7 @@ class RouteController extends Controller
                     }
                     if($request->id) {
                         $route = new Route();
-                        $children = $route->getChildrenRoutesIds($request->id);
+                        $children = $route->getChildrenIds($request->id);
                         if(!empty($children) && in_array($value,$children)) {
                             return $fail("Không thể chọn định tuyến con để phụ thuộc");
                         }

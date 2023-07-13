@@ -580,6 +580,56 @@ a.popper-notifications-footer {
     vertical-align: middle;
 }
 
+/* Style Yes/No */
+.form-yes-no-wrapper label {
+    display: inline-flex;
+    align-items: center;
+    cursor: pointer;
+    position: relative;
+    border: 1px solid var(--border-color);
+}
+.form-yes-no-wrapper input {
+    display: none;
+}
+.form-yes-no-wrapper label i {
+    content: "";
+    position: absolute;
+    width: 50%;
+    height: 100%;
+    background: #ccc;
+    left: 50%;
+    transition: left 0.5s ease;
+}
+.form-yes-no-wrapper input:checked + i {
+    left: 0;
+}
+.form-yes-no-wrapper label span {
+    flex: 0 0 100px;
+    width: 100px;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    height: 43px;
+    justify-content: center;
+    background: var(--btn-danger-color);
+    color: #fff;
+}
+.form-yes-no-wrapper label span:last-child {
+    background-color: var(--btn-success-color);
+}
+
+/* List Check */
+.form-check-list {
+    margin-left: -10px;
+    margin-right: -10px;
+    margin-top: -10px;
+}
+.form-check-list label {
+    padding-left: 10px;
+    padding-right: 10px;
+    margin-top: 10px;
+}
+
 
 /* Data table */
 .data-heading {
@@ -975,6 +1025,11 @@ a.popper-notifications-footer {
     }
     .form-field-body {
         flex: 1 1 auto;
+    }
+
+    /* List Check */
+    .form-check-list {
+        margin-top: 2px;
     }
 }
 

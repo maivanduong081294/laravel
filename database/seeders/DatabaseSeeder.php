@@ -30,6 +30,7 @@ class DatabaseSeeder extends Seeder
                     'email' => 'superadmin@gmail.com',
                     'email_verified_at' => date('Y-m-d H:i:s'),
                     'group_id' =>  $admin_group->id,
+                    'super_admin' =>  1,
                     'status' =>  1,
                 ],
                 [

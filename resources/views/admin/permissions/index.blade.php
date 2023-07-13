@@ -62,7 +62,7 @@
                     </div>
                     <div class="data-heading-filter">
                         {{-- <x-styles.select default="Nhóm người dùng" name="group" selected="{{request()->getMethod}}" values="{{json_encode($listGroup)}}"/> --}}
-                        <x-styles.select default="Nhóm người dùng" name="group" selected="{{request()->getMethod}}" values="{{json_encode($listGroup)}}"/>
+                        <x-styles.select default="Nhóm người dùng" name="group" selected="{{request()->group}}" values="{{json_encode($listGroup)}}"/>
                         <x-styles.select default="Trạng thái" name="status" selected="{{request()->status}}" values="{{json_encode($listStatus)}}"/>
                         <x-styles.select default="Menu" name="hidden" selected="{{request()->hidden}}" values="{{json_encode($listHidden)}}"/>
                         <x-styles.button type="submit" content="Lọc" />

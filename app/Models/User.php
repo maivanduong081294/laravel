@@ -29,7 +29,7 @@ CanResetPasswordContract
      * @var array
      */
     protected $fillable = [
-        'fullname','username', 'email', 'password','status','email_verified_token',
+        'fullname','username', 'email', 'password','status','email_verified_token','super_admin','parent_id'
     ];
 
     /**
@@ -51,6 +51,8 @@ CanResetPasswordContract
     ];
     protected $attributes = [
         'status' => 0,
+        'parent_id' => 0,
+        'super_admin' => 0,
     ];
     
     protected $redirectTo = '/admin';
@@ -110,7 +112,7 @@ CanResetPasswordContract
     public function isRootUser() {
         $user = self::getCurrentUser();
         if($user) {
-            if($user->id == 1) {
+            if($user->super_admin == 1) {
                 return true;
             }
         }

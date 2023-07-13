@@ -23,6 +23,7 @@ class CreateUsersTable extends Migration
             $table->tinyInteger('status')->default(0);
             $table->string('email_verified_token',255)->nullable();
             $table->integer('parent_id')->default(0)->nullable();
+            $table->integer('super_admin')->default(0)->nullable();
             $table->rememberToken();
             $table->timestamps();
         });

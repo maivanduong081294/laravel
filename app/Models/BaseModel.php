@@ -183,8 +183,7 @@ class BaseModel extends Model
         if(!self::hasCache($keyCache)) {
             $query = self::select();
             $query = self::setWhere($query,$where);
-            $result = $query->first();
-            $value = $result->count() > 0?$result:[];
+            $value = $query->first();
             self::setCache($keyCache,$value);
         }
         return $value;

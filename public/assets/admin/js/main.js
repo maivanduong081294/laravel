@@ -25,7 +25,6 @@ $(document).ready(function() {
         var attributes = {};
         if($this.hasClass('multiple')) {
             attributes.multiple = true;
-            attributes.allowClear = true;
         }
         if($this.data('placeholder')) {
             attributes.placeholder = $this.data('placeholder');
@@ -236,5 +235,27 @@ $(document).ready(function() {
         else {
             alert('Lỗi! Vui lòng thử lại sau!');
         }
+    });
+    $(document).on('click','.form-yes-no-wrapper input.yes-option',function() {
+        $(this).siblings('input.no-option').click();
+    });
+    $('.form-check-list .select-all input').on('change',function(e){
+        e.preventDefault();
+        let checked = false;
+        if($(this).is(':checked')) {
+            checked = true;
+        }
+        const list = $(this).parents('.form-check-list').find('input');
+        list.prop('checked',checked);
+        list.prop('checked',checked);
+    });
+    $('.form-check-list label:not(.select-all) input').on('change',function(e){
+        e.preventDefault();
+        let checked = false;
+        console.log();
+        if(!$(this).parents('.form-check-list').find('label:not(.select-all) input:not(:checked)').length) {
+            checked = true;
+        }
+        $(this).parents('.form-check-list').find('.select-all input').prop('checked',checked);
     });
 });

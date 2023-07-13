@@ -17,7 +17,6 @@ class CreatePermissionsTable extends Migration
             $table->id();
             $table->string('name',255);
             $table->string('icon',255)->nullable();
-            $table->string('link',255);
             $table->string('group_ids',255);
             $table->string('user_ids',255);
             $table->integer('parent_id')->default(0);
@@ -28,7 +27,7 @@ class CreatePermissionsTable extends Migration
         });
 
         Schema::table('permissions',function(Blueprint $table) {
-            $table->unsignedBigInteger('route_id')->nullable()->after('link');
+            $table->unsignedBigInteger('route_id')->nullable()->after('icon');
             $table->foreign('route_id')->references('id')->on('routes');
         });
     }

@@ -100,8 +100,7 @@ class RouteController extends Controller
             }
             $data = $request->all();
             $item = $route->create($request->all());
-            return 111;
-            //return redirect()->route('admin.routes.edit',['id'=>$item->id])->with(['msg'=>'Thêm định tuyến thành công','type'=>'success']);
+            return redirect()->route($this->homeRoute.'.edit',['id'=>$item->id])->with(['msg'=>'Thêm định tuyến thành công','type'=>'success']);
         }
         $this->title = 'Thêm định tuyến';
         $this->heading = 'Thêm định tuyến';
@@ -113,12 +112,9 @@ class RouteController extends Controller
         ];
         self::setBreadcrumb($breadcrumbs);
 
-        $statusList = self::getStatusList();
-        $hiddenList = self::getHiddenList();
-
         $treeRoute = $route->showTree();
 
-        return $this->view('add',compact('statusList','hiddenList','treeRoute'));
+        return $this->view('add',compact('treeRoute'));
     }
 
     public function edit(Request $request) {
@@ -126,7 +122,7 @@ class RouteController extends Controller
         $itemid = $request->id;
         $detail = $route->getDetailById($itemid);
         if(!$detail) {
-            return redirect()->route('admin.routes')->with(['msg'=>'Định tuyến không tồn tại']);
+            return redirect()->route($this->homeRoute)->with(['msg'=>'Định tuyến không tồn tại']);
         }
 
         if($request->isMethod('POST')) {
@@ -152,12 +148,10 @@ class RouteController extends Controller
             ],
         ];
         self::setBreadcrumb($breadcrumbs);
-        $statusList = self::getStatusList();
-        $hiddenList = self::getHiddenList();
 
         $treeRoute = $route->showTree($detail->id);
 
-        return $this->view('edit',compact('statusList','hiddenList','treeRoute','detail'));
+        return $this->view('edit',compact('treeRoute','detail'));
     }
 
     public function delete(Request $request) {
@@ -288,20 +282,6 @@ class RouteController extends Controller
         else {
             abort(404);
         }
-    }
-
-    function getHiddenList() {
-        return [
-            0 => "Cho phép phân quyền",
-            1 => "Ẩn phân quyền",
-        ];
-    }
-
-    function getStatusList() {
-        return [
-            0 => "Không hoạt động",
-            1 => "Hoạt động",
-        ];
     }
 
     function validator($request) {

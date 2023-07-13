@@ -30,10 +30,10 @@
                     </div>
                 </div>
                 <div class="form-group-body">
-                    <x-form.input label="Tên phân quyền" value="{{old('name')}}" id="name" name="name" placeholder="true"/>
-                    <x-form.input label="Icon" value="{{old('icon')}}" id="icon" name="icon" placeholder="fa-solid fa-access"/>
-                    <x-form.select default="Chọn quyền truy cập" label="Quyền truy cập" selected="{{old('route_id')}}" id="route_id" name="route_id" values="{{json_encode($listRoute)}}"/>
-                    <x-form.select default="Chọn quyền phụ thuộc" label="Quyền phụ thuộc" selected="{{old('parent_id')}}" id="parent_id" name="parent_id" values="{{json_encode($listPermission)}}"/>
+                    <x-form.input label="Tên phân quyền" value="{{old('name') ?? $detail->name}}" id="name" name="name" placeholder="true"/>
+                    <x-form.input label="Icon" value="{{old('icon') ?? $detail->icon}}" id="icon" name="icon" placeholder="fa-solid fa-access"/>
+                    <x-form.select default="Chọn quyền truy cập" label="Quyền truy cập" selected="{{old('route_id') ?? $detail->route_id}}" id="route_id" name="route_id" values="{{json_encode($listRoute)}}"/>
+                    <x-form.select default="Chọn quyền phụ thuộc" label="Quyền phụ thuộc" selected="{{old('parent_id') ?? $detail->parent_id}}" id="parent_id" name="parent_id" values="{{json_encode($listPermission)}}"/>
                 </div>
             </div>
 
@@ -45,8 +45,12 @@
                     </div>
                 </div>
                 <div class="form-group-body">
-                    <x-form.list-check all="1" label="Nhóm người dùng" selected="{{json_encode(old('group_ids'))}}" id="group_ids" placeholder="true" multiple="true" name="group_ids[]" values="{{json_encode($listGroup)}}"/>
-                    <x-form.select label="Tài khoản" selected="{{json_encode(old('user_ids'))}}" id="user_ids" placeholder="true" multiple="true" name="user_ids[]" values="{{json_encode($listUser)}}"/>
+                    @php
+                        $group_ids = old('method') ? json_encode(old('method')) : json_encode(explode(",",$detail->group_ids));
+                        $user_ids = old('method') ? json_encode(old('method')) : json_encode(explode(",",$detail->user_ids));
+                    @endphp
+                    <x-form.list-check all="1" label="Nhóm người dùng" selected="{{$group_ids}}" id="group_ids" placeholder="true" multiple="true" name="group_ids[]" values="{{json_encode($listGroup)}}"/>
+                    <x-form.select label="Tài khoản" selected="{{$user_ids}}" id="user_ids" placeholder="true" multiple="true" name="user_ids[]" values="{{json_encode($listUser)}}"/>
                 </div>
             </div>
 
@@ -58,8 +62,8 @@
                     </div>
                 </div>
                 <div class="form-group-body">
-                    <x-form.yesno label="Ẩn Menu" value="{{old('hidden') ?? 0}}" id="hidden" name="hidden" />
-                    <x-form.yesno label="Trạng thái" value="{{old('status') ?? 1}}" yes="Hoạt động" no="Không hoạt động" id="status" name="status" />
+                    <x-form.yesno label="Ẩn Menu" value="{{old('hidden') ?? $detail->hidden}}" id="hidden" name="hidden" />
+                    <x-form.yesno label="Trạng thái" value="{{old('status') ?? $detail->status}}" yes="Hoạt động" no="Không hoạt động" id="status" name="status" />
                 </div>
             </div>
         </div>

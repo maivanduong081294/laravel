@@ -6,6 +6,7 @@ use App\Http\Controllers\Admin\Controller;
 use Illuminate\Http\Request;
 
 use Auth;
+use Validator;
 use DB;
 
 use App\Models\User;
@@ -25,8 +26,6 @@ class PermissionController extends Controller
 
     public function index(Request $request)
     {
-        //
-
         $actions = self::indexPageActions();
         $listStatus = self::getStatusList();
         $listHidden = self::getHiddenList();
@@ -83,7 +82,24 @@ class PermissionController extends Controller
         return $this->view('index',compact('list','perPage','actions','listGroup','listStatus','listHidden'));
     }
 
-    public function add() {
+    public function add(Request $request) {
+        $permission = new Permission();
+
+        if($request->isMethod('POST')) {
+            if(!$request->has('group_ids')) {
+                $request->request->add(['group_ids' => []]);
+            }
+            if(!$request->has('user_ids')) {
+                $request->request->add(['user_ids' => []]);
+            }
+            
+            $validator = self::validator($request);
+            if($validator->fails()) {
+                return back()->withErrors($validator)->withInput()->with('msg','Chỉnh sửa phân quyền không thành công');
+            }
+            $item = $permission->create($request->all());
+            return redirect()->route($this->homeRoute.'.edit',['id'=>$item->id])->with(['msg'=>'Thêm phân quyền thành công','type'=>'success']);
+        }
         $this->title = 'Thêm quyền truy cập';
         $this->heading = 'Thêm mới';
         $this->setBreadcrumb ([
@@ -92,8 +108,6 @@ class PermissionController extends Controller
                 'title' => 'Phân quyền'
             ],
         ]);
-
-        $permission = new Permission();
         $route = new Route();
         $user = new User();
 
@@ -103,11 +117,54 @@ class PermissionController extends Controller
         $listRoute = $route->showTree([],$whereRoute);
         $listUser = $user->showTree();
         $listPermission = $permission->showTree();
-        $listStatus = self::getStatusList();
-        $listHidden = self::getHiddenList();
         $listGroup = self::getGroupList();
 
-        return $this->view('add',compact('listGroup','listStatus','listHidden','listRoute','listUser','listPermission'));
+        return $this->view('add',compact('listGroup','listRoute','listUser','listPermission'));
+    }
+
+    public function edit(Request $request) {
+        $permission = new Permission();
+        $itemid = $request->id;
+        $detail = $permission->getDetailById($itemid);
+        if(!$detail) {
+            return redirect()->route($this->homeRoute)->with(['msg'=>'Phân quyền không tồn tại']);
+        }
+
+        if($request->isMethod('POST')) {
+            if(!$request->has('group_ids')) {
+                $request->request->add(['group_ids' => []]);
+            }
+            if(!$request->has('user_ids')) {
+                $request->request->add(['user_ids' => []]);
+            }
+            
+            $validator = self::validator($request);
+            if($validator->fails()) {
+                return back()->withErrors($validator)->withInput()->with('msg','Tạo phân quyền không thành công');
+            }
+            $item = $permission->updateById($itemid,$request->all());
+            return back()->with(['msg'=>'Cập nhật thành công','type'=>'success']);
+        }
+        $this->title = 'Chỉnh sửa quyền truy cập';
+        $this->heading = 'Chỉnh sửa';
+        $this->setBreadcrumb ([
+            [
+                'link' => route($this->homeRoute),
+                'title' => 'Phân quyền'
+            ],
+        ]);
+        $route = new Route();
+        $user = new User();
+
+        $whereRoute = [
+            ['super_admin',0]
+        ];
+        $listRoute = $route->showTree([],$whereRoute);
+        $listUser = $user->showTree();
+        $listPermission = $permission->showTree($detail->id);
+        $listGroup = self::getGroupList();
+
+        return $this->view('edit',compact('detail','listGroup','listRoute','listUser','listPermission'));
     }
 
     public function menu() {
@@ -191,5 +248,84 @@ class PermissionController extends Controller
             0 => "Không hoạt động",
             1 => "Hoạt động",
         ];
+    }
+
+    private function validator ($request) {
+        $rules = [
+            'name' => 'required',
+            'route_id' => ['required',function($attribte,$value,$fail) use ($request) {
+                $obj = new Permission();
+                $route = new Route();
+                $where = [
+                    ['route_id',$value],
+                ];
+                if($request->id) {
+                    $where[] = ['id','!=',$request->id];
+                }
+                $item = $obj->getDetail($where);
+                if($item) {
+                    return $fail('Quyền này đã được tạo rồi bạn có thể vào chỉnh sửa');
+                }
+                else {
+                    $routeDetail = $route->getDetailById($value);
+                    if(!$routeDetail) {
+                        return $fail('Không tìm thấy quyền được chọn');
+                    }
+                }
+            }],
+            'group_ids' => [function($attribute,$value,$fail) use($request) {
+                if(empty($request->group_ids) && empty($request->user_ids)) {
+                    return $fail('Nhóm người dùng hoặc Tài khoản không thể để trống');
+                }
+                elseif(!empty($request->group_ids)) {
+                    $group_ids = array_keys((array)self::getGroupList());
+                    $checkList = array_intersect($request->group_ids,$group_ids);
+                    if(empty($checkList)) {
+                        return $fail('Nhóm người dùng không tồn tại');
+                    }
+                }
+            }],
+            'user_ids' =>[function($attribute,$value,$fail) use($request) {
+                if(empty($request->group_ids) && empty($request->user_ids)) {
+                    return $fail('Nhóm người dùng hoặc Tài khoản không thể để trống');
+                }
+                elseif(!empty($request->user_ids)) {
+                    $user = new User();
+                    $user_ids = array_keys((array) $user->showTree());
+                    $checkList = array_intersect($request->user_ids,$user_ids);
+                    if(empty($checkList)) {
+                        return $fail('Tài khoản không tồn tại');
+                    }
+                }
+            }],
+            'parent_id' => [function($attribute,$value,$fail) use($request) {
+                $value = (int) $value;
+                if($value > 0) {
+                    $obj = new Permission();
+                    $item = $obj->getDetailById($value);
+                    if(!$item) {
+                        return $fail("Quyền phụ thuộc không tồn tại");
+                    }
+                    if($request->id) {
+                        $children = $obj->getChildrenIds($request->id);
+                        if(!empty($children) && in_array($value,$children)) {
+                            return $fail("Không thể chọn phân quyền con để phụ thuộc");
+                        }
+                    }
+                }
+            }],
+        ];
+
+        $message = [
+            'required' => ':attribute không thể để trống'
+        ];
+
+        $attributes = [
+            'name' => 'Tên phân quyền',
+            'route_id' => 'Quyền truy cập',
+        ];
+
+        $validator = Validator::make($request->all(),$rules,$message,$attributes);
+        return $validator;
     }
 }

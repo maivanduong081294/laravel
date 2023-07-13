@@ -32,13 +32,35 @@
                 <div class="form-group-body">
                     <x-form.input label="Tiêu đề định tuyến" value="{{old('title')}}" id="title" name="title" placeholder="true"/>
                     <x-form.input label="Đường dẫn" value="{{old('uri')}}" id="uri" name="uri" placeholder="true"/>
+                    <x-form.select default="Chọn đinh tuyến cha (nếu có)" label="Thuộc đinh tuyến" selected="{{old('parent_id')}}" id="parent_id" name="parent_id" values="{{json_encode($treeRoute)}}"/>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="form-group-heading">
+                    <div class="form-group-heading-wrapper">
+                        <i class="fa-solid fa-screwdriver-wrench"></i>
+                        <h2>Cấu hình</h2>
+                    </div>
+                </div>
+                <div class="form-group-body">
                     <x-form.select default="Chọn methods" label="Methods" selected="{{json_encode(old('method'))}}" id="method" placeholder="true" multiple="true" name="method[]" keyByValue="1" values="{{json_encode(routeMethods())}}"/>
                     <x-form.select default="Chọn Controller" label="Controller" selected="{{old('controller')}}" id="controller" name="controller" keyByValue="1" values="{{json_encode(listAdminController(true))}}"/>
-                    <x-form.input label="Function" value="{{old('function')}}" id="function" name="function" placeholder="true"/>
+                    <x-form.input label="Function" value="{{old('function')}}" id="function" name="function" placeholder="true  "/>
                     <x-form.input label="Middleware" value="{{old('middleware')}}" id="middleware" name="middleware" placeholder="true"/>
-                    <x-form.select default="Chọn đinh tuyến cha (nếu có)" label="Thuộc đinh tuyến" selected="{{old('parent_id')}}" id="parent_id" name="parent_id" values="{{json_encode($treeRoute)}}"/>
-                    <x-form.select label="Hiển thị phân quyền" selected="{{old('hidden') ?? 0}}" id="hidden" name="hidden" values="{{json_encode($hiddenList)}}"/>
-                    <x-form.select label="Trạng thái" selected="{{old('status') ?? 1}}" id="status" name="status" values="{{json_encode($statusList)}}"/>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="form-group-heading">
+                    <div class="form-group-heading-wrapper">
+                        <i class="fa-solid fa-calendar-check"></i>
+                        <h2>Tuỳ chọn</h2>
+                    </div>
+                </div>
+                <div class="form-group-body">
+                    <x-form.yesno label="Ẩn phân quyền" value="{{old('hidden') ?? 0}}" id="hidden" name="hidden" />
+                    <x-form.yesno label="Trạng thái" value="{{old('status') ?? 1}}" yes="Hoạt động" no="Không hoạt động" id="status" name="status" />
                 </div>
             </div>
         </div>

@@ -10,8 +10,8 @@ class Permission extends BaseModel
 
     protected $fillable = [
         "name",
-        "link",
         "icon",
+        "route_id",
         "group_ids",
         "user_ids",
         "parent_id",
@@ -25,4 +25,11 @@ class Permission extends BaseModel
     ];
 
     protected $nameCol = 'name';
+
+
+
+    public function filterData($data) {
+        $data = parent::filterData($data);
+        return $data;
+    }
 }

@@ -65,3 +65,26 @@ function routeMethods() {
         "GET","POST","PUT","DELETE",
     ];
 }
+
+function getRouteByName($name) {
+    $routes = Route::getRoutes();
+    return $routes->getByName($name);
+}
+
+function getLinkByRouteName($name,string $method="GET") {
+    $method = strtoupper($method);
+    if(!in_array($method, routeMethods())) {
+        return "";
+    }
+    $route = getRouteByName($name);
+    $link = '';
+    if($route) {
+        preg_match_all('/{(.*?)}/',  $route->uri, $matchedMissingParameters);
+        if(empty($matchedMissingParameters[0])) {
+            if(in_array($method,$route->methods())) {
+                return route($name);
+            }
+        }
+    }
+    return $link;
+}

@@ -32,8 +32,7 @@
                 <div class="form-group-body">
                     <x-form.input label="Tên phân quyền" value="{{old('name') ?? $detail->name}}" id="name" name="name" placeholder="true"/>
                     <x-form.input label="Icon" value="{{old('icon') ?? $detail->icon}}" id="icon" name="icon" placeholder="fa-solid fa-access"/>
-                    <x-form.select default="Chọn quyền truy cập" label="Quyền truy cập" selected="{{old('route_id') ?? $detail->route_id}}" id="route_id" name="route_id" values="{{json_encode($listRoute)}}"/>
-                    <x-form.select default="Chọn quyền phụ thuộc" label="Quyền phụ thuộc" selected="{{old('parent_id') ?? $detail->parent_id}}" id="parent_id" name="parent_id" values="{{json_encode($listPermission)}}"/>
+                    <x-form.select default="Chọn quyền truy cập" label="Quyền truy cập" disabled="{{json_encode($selectedRoutes)}}" selected="{{old('route_id') ?? $detail->route_id}}" id="route_id" name="route_id" values="{{json_encode($listRoute)}}"/>
                 </div>
             </div>
 
@@ -69,9 +68,22 @@
         </div>
         <div class="detail-sidebar">
             <div class="detail-sidebar-wrapper">
-                <div class="detail-sidebar-group detail-actions">
-                    <x-styles.button type="submit" content="Save" left-icon='<i class="fa-solid fa-floppy-disk"></i>' />
-                    <x-styles.button class="btn-danger" href="{{route('admin.routes')}}" right-icon='<i class="fa-solid fa-right-to-bracket"></i>' content="Quay lại" />
+                <div class="form-group">
+                    <div class="form-group-heading">
+                        <div class="form-group-heading-wrapper">
+                            <i class="fa-solid fa-circle-info"></i>
+                            <h2>Phân quyền cha</h2>
+                        </div>
+                    </div>
+                    <div class="form-group-body">
+                        <x-form.list-check one-value="true" style="list" default="Chọn phân quyền cha" selected="{{old('parent_id') || $detail->parent_id}}" id="parent_id" name="parent_id" values="{{json_encode($listPermission)}}"/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="form-group-body detail-actions">
+                        <x-styles.button type="submit" content="Save" left-icon='<i class="fa-solid fa-floppy-disk"></i>' />
+                        <x-styles.button class="btn-danger" href="{{route('admin.permissions')}}" right-icon='<i class="fa-solid fa-right-to-bracket"></i>' content="Quay lại" />
+                    </div>
                 </div>
             </div>
         </div>

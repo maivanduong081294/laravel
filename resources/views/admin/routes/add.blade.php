@@ -32,7 +32,6 @@
                 <div class="form-group-body">
                     <x-form.input label="Tiêu đề định tuyến" value="{{old('title')}}" id="title" name="title" placeholder="true"/>
                     <x-form.input label="Đường dẫn" value="{{old('uri')}}" id="uri" name="uri" placeholder="true"/>
-                    <x-form.select default="Chọn đinh tuyến cha (nếu có)" label="Thuộc đinh tuyến" selected="{{old('parent_id')}}" id="parent_id" name="parent_id" values="{{json_encode($treeRoute)}}"/>
                 </div>
             </div>
 
@@ -66,9 +65,22 @@
         </div>
         <div class="detail-sidebar">
             <div class="detail-sidebar-wrapper">
-                <div class="detail-sidebar-group detail-actions">
-                    <x-styles.button type="submit" content="Save" left-icon='<i class="fa-solid fa-floppy-disk"></i>' />
-                    <x-styles.button class="btn-danger" href="{{route('admin.routes')}}" right-icon='<i class="fa-solid fa-right-to-bracket"></i>' content="Quay lại" />
+                <div class="form-group">
+                    <div class="form-group-heading">
+                        <div class="form-group-heading-wrapper">
+                            <i class="fa-solid fa-calendar-check"></i>
+                            <h2>Định tuyến cha</h2>
+                        </div>
+                    </div>
+                    <div class="form-group-body">
+                        <x-form.list-check one-value="true" style="list" selected="{{old('parent_id')}}" id="parent_id" name="parent_id" values="{{json_encode($treeRoute)}}"/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="form-group-body detail-actions">
+                        <x-styles.button type="submit" content="Save" left-icon='<i class="fa-solid fa-floppy-disk"></i>' />
+                        <x-styles.button class="btn-danger" href="{{route('admin.routes')}}" right-icon='<i class="fa-solid fa-right-to-bracket"></i>' content="Quay lại" />
+                    </div>
                 </div>
             </div>
         </div>

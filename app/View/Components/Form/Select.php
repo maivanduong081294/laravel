@@ -11,8 +11,8 @@ class Select extends Component
      *
      * @return void
      */
-    public $attrs,$selectAttrs,$values,$default,$keyByValue,$selected,$label,$name,$id,$multiple;
-    public function __construct($values,$name,$id="",$onchange="",$class="",$selected="",$default="",$keyByValue="0",$label='',$multiple = false,$placeholder='')
+    public $attrs,$selectAttrs,$values,$default,$keyByValue,$selected,$label,$name,$id,$multiple,$disabled;
+    public function __construct($values,$name,$id="",$onchange="",$class="",$selected="",$default="",$keyByValue="0",$label='',$multiple = false,$placeholder='',$disabled="")
     {
         //
         $attributes = [
@@ -53,7 +53,14 @@ class Select extends Component
         }
 
         $values = json_decode(htmlspecialchars_decode($values));
+        if($disabled) {
+            $disabled = json_decode(htmlspecialchars_decode($disabled));
+        }
+        else {
+            $disabled = [];
+        }
         $this->label = $label;
+        $this->disabled = $disabled;
         $this->id = $id;
         $this->values = $values;
         $this->name = $name;

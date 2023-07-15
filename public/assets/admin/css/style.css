@@ -64,6 +64,9 @@ a {
 	-ms-transition: 0.5s color, 0.5s background;
 	text-decoration: none;
 }
+label {
+    cursor: pointer;
+}
 a:hover {
     color: #343a40;
 }
@@ -430,7 +433,6 @@ a.popper-notifications-footer {
 .style-checkbox {
 	display: inline-flex;
 	align-items: center;
-	cursor: pointer;
 	margin: 0;
     position: relative;
 }
@@ -447,6 +449,7 @@ a.popper-notifications-footer {
     align-items: center;
     justify-content: center;
     border: 1px solid var(--primary-color);
+    position: relative;
 }
 .style-checkbox input[type="radio"] + i {
     border-radius: 100%;
@@ -579,6 +582,39 @@ a.popper-notifications-footer {
     outline: none;
     vertical-align: middle;
 }
+.select2-container--default .select2-selection--single {
+    border: 1px solid var(--primary-color);
+    outline: none;
+    width: 100%;
+    padding: 6px 15px;
+    height: auto;
+    border-radius: 0;
+}
+.select2-container--default .select2-selection--single .select2-selection__rendered {
+    color: inherit;
+    line-height: inherit;
+}
+.select2-container--default .select2-selection--single .select2-selection__arrow {
+    top: 50%;
+    transform: translateY(-50%);
+}
+.select2-container--default .select2-selection--multiple  {
+    border: 1px solid var(--primary-color);
+    outline: none;
+    width: 100%;
+    padding: 4px 10px 9px 5px;
+    height: auto;
+    border-radius: 0;
+}
+.select2-container--default .select2-selection--multiple .select2-selection__choice,
+.select2-container--default .select2-selection--multiple .select2-selection__choice__remove {
+    border-color: var(--primary-color);
+    background-color: var(--btn-primary-opacity-color);
+}
+.select2-container--default .select2-search--inline .select2-search__field {
+    height: 23px;
+    font-family: inherit;
+}
 
 /* Style Yes/No */
 .form-yes-no-wrapper label {
@@ -623,11 +659,21 @@ a.popper-notifications-footer {
     margin-left: -10px;
     margin-right: -10px;
     margin-top: -10px;
+    max-height: 180px;
+    overflow: hidden auto;
 }
 .form-check-list label {
     padding-left: 10px;
     padding-right: 10px;
     margin-top: 10px;
+    display: inline-flex;
+    align-items: center;
+}
+.form-list-check.list-style .form-check-list label {
+    display: flex;
+}
+.form-list-check.list-style .form-check-list label:first-child {
+    margin-top: 0;
 }
 
 
@@ -771,31 +817,6 @@ a.popper-notifications-footer {
     height: auto;
     border-radius: 0;
 }
-.form-select-wrapper .select2-container--default .select2-selection--single .select2-selection__rendered {
-    color: inherit;
-    line-height: inherit;
-}
-.form-select-wrapper .select2-container--default .select2-selection--single .select2-selection__arrow {
-    top: 50%;
-    transform: translateY(-50%);
-}
-.form-select-wrapper .select2-container--default .select2-selection--multiple  {
-    border: 1px solid var(--primary-color);
-    outline: none;
-    width: 100%;
-    padding: 4px 10px 9px 5px;
-    height: auto;
-    border-radius: 0;
-}
-.form-select-wrapper .select2-container--default .select2-selection--multiple .select2-selection__choice,
-.form-select-wrapper .select2-container--default .select2-selection--multiple .select2-selection__choice__remove {
-    border-color: var(--primary-color);
-    background-color: var(--btn-primary-opacity-color);
-}
-.form-select-wrapper .select2-container--default .select2-search--inline .select2-search__field {
-    height: 23px;
-    font-family: inherit;
-}
 
 /* Data Table */
 .table-data table tbody tr td .btn {
@@ -808,14 +829,6 @@ a.popper-notifications-footer {
 /* Sidebar Detail */
 .detail-sidebar {
     margin-top: 20px;
-}
-.detail-sidebar-group {
-    padding: 15px;
-    background: #fff;
-    margin-top: 20px;
-}
-.detail-sidebar-group:first-child {
-    margin-top: 0;
 }
 
 @media (max-width: 767px) {
@@ -1105,28 +1118,28 @@ a.popper-notifications-footer {
     }
 
     /* Form */
-    .form-group {
+    :not(.detail-sidebar-wrapper) > .form-group {
         display: flex;
     }
-    .form-group-heading {
+    :not(.detail-sidebar-wrapper) > .form-group .form-group-heading {
         flex: 0 0 30%;
         max-width: 250px;
         display: flex;
         align-items: center;
     }
-    .form-group-heading-wrapper {
+    :not(.detail-sidebar-wrapper) > .form-group .form-group-heading-wrapper {
         flex: 1;
         display: block;
         text-align: center;
     }
-    .form-group-heading i {
+    :not(.detail-sidebar-wrapper) > .form-group .form-group-heading i {
         font-size: 60px;
         margin-bottom: 15px;
     }
-    .form-group-heading h2 {
+    :not(.detail-sidebar-wrapper) > .form-group .form-group-heading h2 {
         font-size: 22px;
     }
-    .form-group-body {
+    :not(.detail-sidebar-wrapper) > .form-group .form-group-body {
         flex: 1 1 auto;
     }
 }

@@ -17,7 +17,7 @@
                         @php
                             $key = $keyByValue ? $value : $key;
                         @endphp
-                        <option value="{{$key}}" {{in_array($key,$selected)?" selected":"" }}>{{$value}}</option>
+                        <option value="{{$key}}" {{in_array($key,$disabled)?" disabled":"" }} {{in_array($key,$selected)?" selected":"" }}>{{$value}}</option>
                     @endforeach
                 @endif
             </select>

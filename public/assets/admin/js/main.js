@@ -258,4 +258,9 @@ $(document).ready(function() {
         }
         $(this).parents('.form-check-list').find('.select-all input').prop('checked',checked);
     });
+    $('.one-value input').on('change',function(e){
+        e.preventDefault();
+        let checked = false;
+        $(this).parent('label').siblings('label').find('input').prop('checked',false);
+    });
 });

@@ -77,7 +77,7 @@ class BaseModel extends Model
                                 break;
                             }
                         }
-                        if($check == false && count($where) > 1) {
+                        if($check == false && count($where) > 0) {
                             if(isset($item[0]) && is_array($item[0])) {
                                 $query->$method(function ($query) use ($item,$method,$otherMethod) {
                                     $i = 0;

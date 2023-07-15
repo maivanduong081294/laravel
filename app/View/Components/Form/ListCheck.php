@@ -12,10 +12,11 @@ class ListCheck extends Component
      * @return void
      */
     public $id,$label,$attrs,$inputAttrs,$name,$selected,$values,$keyByValue,$all;
-    public function __construct($values,$name,$id,$label,$type='checkbox',$selected="",$readonly='',$class='',$all='',$keyByValue="0")
+    public function __construct($values,$name,$id,$label='',$type='checkbox',$selected="",$readonly='',$class='',$all='',$keyByValue="0",$style='',$oneValue='')
     {
         $type = $type==='radio'?'radio':'checkbox';
         $readonly = $readonly == 'true'?"true":'';
+        $oneValue = $oneValue == 'true'?" one-value":'';
         $all = $all?true:false;
 
         $inputAttrs = [
@@ -23,9 +24,16 @@ class ListCheck extends Component
             'name' => $name,
             'disabled' => $readonly,
         ];
+        switch ($style) {
+            case 'list':
+                $class.=" list-style";
+                break;
+            default:
+        }
+        $class.=$oneValue;
 
         $attrs = [
-            'class'=> 'form-field form-list-check '.$class,
+            'class'=> 'form-field form-list-check style-checkbox '.trim($class),
         ];
 
         $newSelected = json_decode(htmlspecialchars_decode($selected),true);

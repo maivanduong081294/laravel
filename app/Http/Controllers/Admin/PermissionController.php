@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Admin\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Routing\UrlGenerator;
 
 use Auth;
 use Validator;
@@ -26,18 +27,20 @@ class PermissionController extends Controller
 
     public function index(Request $request)
     {
+        $permission = new Permission();
+        $user = new User();
+
         $actions = self::indexPageActions();
         $listStatus = self::getStatusList();
         $listHidden = self::getHiddenList();
         $listGroup = self::getGroupList();
-
-        $permission = new Permission();
+        $listUser = $user->showTree();
 
         $where = [];
         $search = trim($request->search);
         if($search) {
             $where[] = [
-                'name','like','%'.$search.'%',
+                'permissions.name','like','%'.$search.'%',
             ];
         }
 
@@ -50,14 +53,34 @@ class PermissionController extends Controller
             }    
         }
 
-        if($request->has('status')) {
+        if($request->has('user')) {
+            $user_id = in_array($request->user,array_keys((array) $listUser))?$request->user:0;
+            if($user_id) {
+                $userDetail = $user->getDetailById($user_id);
+                if($userDetail) {
+                    $sql = "FIND_IN_SET(?, user_ids)";
+                    $sqlData = [$user_id];
+                    $user_group_id = in_array($userDetail->group_id,array_keys((array) $listGroup))?$userDetail->group_id:0;
+                    if(1 || $user_group_id) {
+                        $sql.= " OR FIND_IN_SET(?, group_ids)";
+                        $sqlData[] = $user_group_id;
+                    }
+                    $sql = "({$sql})";
+                    $where[] = [
+                        'raw' => [$sql, $sqlData],
+                    ];
+                }
+            }    
+        }
+
+        if($request->has('status') && $request->status !== null) {
             $status = $request->status=='1'?1:0;
             $where[] = [
                 'status'=>$status
             ];
         }
 
-        if($request->has('hidden')) {
+        if($request->has('hidden') && $request->hidden !== null) {
             $hidden = $request->hidden=='1'?1:0;
             $where[] = [
                 'hidden',$hidden
@@ -75,11 +98,12 @@ class PermissionController extends Controller
             ];
         }
 
-        $list = $permission->getList($where,$order);
+
+        $list = $permission->getListIndex($where,$order);
 
         $perPage = $permission->getPerPage();
 
-        return $this->view('index',compact('list','perPage','actions','listGroup','listStatus','listHidden'));
+        return $this->view('index',compact('list','perPage','actions','listGroup','listStatus','listHidden','listUser'));
     }
 
     public function add(Request $request) {
@@ -119,7 +143,9 @@ class PermissionController extends Controller
         $listPermission = $permission->showTree();
         $listGroup = self::getGroupList();
 
-        return $this->view('add',compact('listGroup','listRoute','listUser','listPermission'));
+        $selectedRoutes = $permission->getSelectedRouteIds();
+
+        return $this->view('add',compact('listGroup','listRoute','listUser','listPermission','selectedRoutes'));
     }
 
     public function edit(Request $request) {
@@ -136,6 +162,9 @@ class PermissionController extends Controller
             }
             if(!$request->has('user_ids')) {
                 $request->request->add(['user_ids' => []]);
+            }
+            if(!$request->has('parent_id')) {
+                $request->request->add(['parent_id' => 0]);
             }
             
             $validator = self::validator($request);
@@ -163,8 +192,9 @@ class PermissionController extends Controller
         $listUser = $user->showTree();
         $listPermission = $permission->showTree($detail->id);
         $listGroup = self::getGroupList();
+        $selectedRoutes = $permission->getSelectedRouteIds($detail->route_id);
 
-        return $this->view('edit',compact('detail','listGroup','listRoute','listUser','listPermission'));
+        return $this->view('edit',compact('detail','listGroup','listRoute','listUser','listPermission','selectedRoutes'));
     }
 
     public function menu() {
@@ -217,15 +247,141 @@ class PermissionController extends Controller
         return array_merge($beforeMenu,$menu,$afterMenu);
     }
 
-    public function delete() {
+    public function delete(Request $request) {
+        $model = new Permission();
+        if($request->has('id')) {
+            $detail = $model->find($request->id);
+            if($detail) {
+                if($detail->super_admin == 1) {
+                    abort(403,'Phân quyền này không thể xoá');
+                }
+                $model->deleteById($request->id);
+                $model->flushCache();
+                $request->session()->flash('msg','Xoá thành công');
+                $request->session()->flash('type','success');
+            }
+            else {
+                abort(404,'Phân quyền không tồn tại');
+            }
+        }
+        elseif($request->has('ids')) {
+            $ids = $request->ids;
+            $where = [
+                [
+                    'super_admin',
+                    '!=',
+                    '1',
+                ]
+            ];
+            $list = $model->getListByIds($ids,$where);
+            if(empty($list)) {
+                $all = $model->getListByIds($ids);
+                if(!empty($all)) { 
+                    abort(403,'Bạn không thể xoá những phân quyền đã chọn');
+                }
+                else {
+                    abort(404,'Phân quyền không tồn tại');
+                }
+            }
+            else {
+                $model->deleteByIds($ids,$where);
+                $model->flushCache();
+                $request->session()->flash('msg','Xoá danh sách thành công');
+                $request->session()->flash('type','success');
+            }
+        }
+        else {
+            abort(404);
+        }
+    }
 
+    public function update(Request $request) {
+        $model = new Permission();
+        if($request->has('id')) {
+            $route = $model->find($request->id);
+            if($route) {
+                if($route->super_admin == 1) {
+                    abort(403,'Router này không thể cập nhật');
+                }
+                $updated = false;
+                if($request->has('hidden')) {
+                    $route->hidden = $request->hidden;
+                    $updated = true;
+                }
+                if($request->has('status')) {
+                    $route->status = $request->status;
+                    $updated = true;
+                }
+                if($updated) {
+                    $route->save();
+                    $request->session()->flash('msg','Cập nhật thành công');
+                    $request->session()->flash('type','success');
+                    $model->flushCache();
+                }
+            }
+            else {
+                abort(404,'Router không tồn tại');
+            }
+        }
+        elseif($request->has('ids')) {
+            $ids = $request->ids;
+            $where = [
+                [
+                    'super_admin',
+                    '!=',
+                    '1',
+                ]
+            ];
+            $list = $model->getListByIds($ids,$where);
+            if(empty($list)) {
+                $all = $model->getListByIds($ids);
+                if(!empty($all)) { 
+                    abort(403,'Bạn không thể cập nhật những Router đã chọn');
+                }
+                else {
+                    abort(404,'Routers không tồn tại');
+                }
+            }
+            else {
+                if($request->has('action')) {
+                    $action = $request->action;
+                    $query = $model->whereIn('id',$ids);
+                    $query = $model->setWhere($query,$where);
+                    switch($action) {
+                        case 'enabled_status':
+                            $query->update(['status'=>1]);
+                            break;
+                        case 'disabled_status':
+                            $query->update(['status'=>0]);
+                            break;
+                        case 'enabled_hidden':
+                            $query->update(['hidden'=>1]);
+                            break;
+                        case 'disabled_hidden':
+                            $query->update(['hidden'=>0]);
+                            break;
+                        default:
+                            abort(404,'Hành động không tồn tại');
+                    }
+                    $request->session()->flash('msg','Cập nhật danh sách thành công');
+                    $request->session()->flash('type','success');
+                    $model->flushCache();
+                }
+                else {
+                    abort(404,'Vui lòng chọn hành động');
+                }
+            }
+        }
+        else {
+            abort(404);
+        }
     }
 
     private function indexPageActions() {
         return [
             'enabled_status' => 'Hoạt động',
             'disabled_status' => 'Không hoạt động',
-            'disabled_hidden' => 'Thêm vào menu',
+            'disabled_hidden' => 'Hiển thị trên menu',
             'enabled_hidden' => 'Ẩn trên menu',
             'delete' => 'Xoá phân quyền',
         ];
@@ -304,12 +460,12 @@ class PermissionController extends Controller
                     $obj = new Permission();
                     $item = $obj->getDetailById($value);
                     if(!$item) {
-                        return $fail("Quyền phụ thuộc không tồn tại");
+                        return $fail("Phân quyền cha không tồn tại");
                     }
                     if($request->id) {
                         $children = $obj->getChildrenIds($request->id);
                         if(!empty($children) && in_array($value,$children)) {
-                            return $fail("Không thể chọn phân quyền con để phụ thuộc");
+                            return $fail("Không thể chọn phân quyền con của nó");
                         }
                     }
                 }

@@ -9,20 +9,27 @@ class CreateMediaTable extends Migration
     public function up()
     {
         Schema::create('media', function (Blueprint $table) {
-            $table->bigIncrements('id');
+            $table->id();
             $table->string('name');
             $table->string('file_name');
             $table->string('disk');
             $table->string('mime_type');
-            $table->unsignedInteger('size');
+            $table->string('type');
+            $table->unsignedBigInteger('author_id');
             $table->timestamps();
+
+            $table->foreign('author_id')
+                  ->references('id')
+                  ->on('users')
+                  ->onDelete('cascade');
         });
 
         Schema::create('mediables', function (Blueprint $table) {
+            $table->id();
             $table->unsignedBigInteger('media_id')->index();
-            $table->unsignedBigInteger('mediable_id')->index();
-            $table->string('mediable_type');
-            $table->string('group');
+            $table->string('type');
+            $table->tinyInteger('remove_bg')->default(0);
+            $table->tinyInteger('webp')->default(0);
 
             $table->foreign('media_id')
                   ->references('id')

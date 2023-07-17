@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "e2716deb7b4fedab90314c733be4284f",
+    "content-hash": "b73005fa772ce6bea0ee1ffe52af4674",
     "packages": [
         {
             "name": "asm89/stack-cors",
@@ -2274,59 +2274,6 @@
                 "source": "https://github.com/opis/closure/tree/3.6.3"
             },
             "time": "2022-01-27T09:35:39+00:00"
-        },
-        {
-            "name": "optix/media",
-            "version": "v0.5.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/optixsolutions/laravel-media.git",
-                "reference": "f1935c3982a6943429912a144d51d113198420fb"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/optixsolutions/laravel-media/zipball/f1935c3982a6943429912a144d51d113198420fb",
-                "reference": "f1935c3982a6943429912a144d51d113198420fb",
-                "shasum": ""
-            },
-            "require": {
-                "intervention/image": "^2.5",
-                "laravel/framework": "~5.8.0|^6.0|^7.0|^8.0",
-                "php": "^7.3"
-            },
-            "require-dev": {
-                "laravel/legacy-factories": "^1.0.4",
-                "mockery/mockery": "^1.2.3",
-                "orchestra/testbench": "~3.8.6|^4.8|^5.2|^6.0"
-            },
-            "type": "library",
-            "extra": {
-                "laravel": {
-                    "providers": [
-                        "Optix\\Media\\MediaServiceProvider"
-                    ]
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "Optix\\Media\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Jack Robertson",
-                    "email": "jack@optixsolutions.co.uk"
-                }
-            ],
-            "support": {
-                "issues": "https://github.com/optixsolutions/laravel-media/issues",
-                "source": "https://github.com/optixsolutions/laravel-media/tree/v0.5.0"
-            },
-            "time": "2020-10-06T13:57:54+00:00"
         },
         {
             "name": "phpoption/phpoption",
@@ -5462,6 +5409,66 @@
                 "source": "https://github.com/tijsverkoyen/CssToInlineStyles/tree/2.2.6"
             },
             "time": "2023-01-03T09:29:04+00:00"
+        },
+        {
+            "name": "tinify/tinify",
+            "version": "1.6.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/tinify/tinify-php.git",
+                "reference": "1d23f5069f450dc33dd062083a825be2baed48ea"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/tinify/tinify-php/zipball/1d23f5069f450dc33dd062083a825be2baed48ea",
+                "reference": "1d23f5069f450dc33dd062083a825be2baed48ea",
+                "shasum": ""
+            },
+            "require": {
+                "ext-curl": "*",
+                "ext-json": "*",
+                "lib-curl": ">=7.20.0",
+                "php": ">=5.3.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^4.8 || ^5.7 || ^6.5 || ^7.5 || ^8.4 || ^9.3"
+            },
+            "type": "library",
+            "autoload": {
+                "files": [
+                    "lib/Tinify.php",
+                    "lib/Tinify/Exception.php"
+                ],
+                "psr-4": {
+                    "Tinify\\": "lib/Tinify/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Rolf Timmermans",
+                    "email": "rolftimmermans@voormedia.com"
+                }
+            ],
+            "description": "PHP client for the Tinify API. Tinify compresses your images intelligently. Read more at https://tinify.com.",
+            "homepage": "https://tinify.com/developers",
+            "keywords": [
+                "api",
+                "compress",
+                "images",
+                "tinify",
+                "tinyjpg",
+                "tinypng"
+            ],
+            "support": {
+                "email": "support@tinify.com",
+                "issues": "https://github.com/tinify/tinify-php/issues",
+                "source": "https://github.com/tinify/tinify-php/tree/1.6.1"
+            },
+            "time": "2023-02-21T14:51:21+00:00"
         },
         {
             "name": "vlucas/phpdotenv",

@@ -7,6 +7,7 @@ use Illuminate\Support\Str;
 use App\Http\Controllers\Admin\Controller;
 
 use Validator;
+use Storage;
 use Intervention\Image\Facades\Image;
 
 use App\Models\Media;
@@ -95,6 +96,11 @@ class UploadController extends Controller
                             }
                         }
                     }
+                    $data = [
+                        'media_id' => $imageDetail->id,
+                        'type' => 'original',
+                    ];
+                    $mediable->create($data);
                 }
             }
         }
@@ -107,12 +113,7 @@ class UploadController extends Controller
 
     public function convertWebp() {
         \Tinify\setKey("ZtSzTNCxDtVBNBRrmfyVQrvgWLZTBHny");
-        // if(file_exists($file_dir)) {
-        //     $source = \Tinify\fromFile($dir.'/'.$imageName);
-        //     $converted = $source->convert(array("type" => ["image/webp","image/png"]));
-        //     $extension = $converted->result()->extension();
-        //     $source->toFile($dir.'/'.$fileName.'.'.$extension);
-        // }
+        
     }
 
     private function validator($request) {

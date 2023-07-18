@@ -15,6 +15,7 @@ class CreateMediaTable extends Migration
             $table->string('disk');
             $table->string('mime_type');
             $table->string('type');
+            $table->bigInteger('item_id')->default(0);
             $table->unsignedBigInteger('author_id');
             $table->timestamps();
 
@@ -28,8 +29,8 @@ class CreateMediaTable extends Migration
             $table->id();
             $table->unsignedBigInteger('media_id')->index();
             $table->string('type');
-            $table->tinyInteger('remove_bg')->default(0);
             $table->tinyInteger('webp')->default(0);
+            $table->string('webp_msg')->nullable();
 
             $table->foreign('media_id')
                   ->references('id')

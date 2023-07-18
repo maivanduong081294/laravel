@@ -11,12 +11,10 @@ class Mediable extends BaseModel
     protected $fillable = [
         "media_id",
         "type",
-        "remove_bg",
         "webp",
     ];
 
     protected $attributes = [
-        "remove_bg" => 0,
         "webp" => 0,
     ];
 

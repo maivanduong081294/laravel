@@ -12,7 +12,7 @@
                 @if ($default)
                     <option value="">{{$default}}</option>
                 @endif
-                @if ($values)
+                @if (!empty($values))
                     @foreach($values as $key=>$value)
                         @php
                             $key = $keyByValue ? $value : $key;

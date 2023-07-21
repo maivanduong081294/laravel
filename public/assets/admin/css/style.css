@@ -158,6 +158,49 @@ figure.image img {
     opacity: 1;
     visibility: visible;
 }
+.popper-fixed {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    margin-top: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgb(0 0 0 / 50%);
+    z-index: 9999;
+}
+.popper-fixed-content {
+    background: #fff;
+    flex: 0 0 calc(100% - 30px);
+    max-width: 400px;
+    max-height: 80%;
+    overflow: hidden auto;
+    box-shadow: 0 0 19px #101010;
+}
+.popper-fixed-content-header {
+    background: var(--primary-color);
+    color: var(--primary-text);
+    padding: 15px;
+    padding-right: 50px;
+    position: relative;
+}
+.popper-fixed-content-body {
+    padding: 15px;
+}
+.popper-fixed-content-header .popper-fixed-close {
+    position: absolute;
+    top: 50%;
+    right: 7px;
+    transform: translateY(-50%);
+    width: 36px;
+    height: 36px;
+    border: 1px solid var(--primary-color);
+    background: #fff;
+    color: var(--primary-color);
+    border-radius: 100%;
+}
 
 /* Notification */
 .popper-notifications-header {
@@ -676,7 +719,6 @@ a.popper-notifications-footer {
     margin-top: 0;
 }
 
-
 /* Data table */
 .data-heading {
     margin-bottom: 10px;
@@ -829,6 +871,19 @@ a.popper-notifications-footer {
 /* Sidebar Detail */
 .detail-sidebar {
     margin-top: 20px;
+}
+
+/* Add New Popper*/
+#add-new-item-form {
+    text-align: center;
+}
+.popper-fixed-content .form-field {
+    display: block;
+}
+.popper-fixed-content .form-field-heading {
+    text-align: left;
+    max-width: unset;
+    padding-right: 0;
 }
 
 @media (max-width: 767px) {

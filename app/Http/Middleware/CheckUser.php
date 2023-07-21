@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Auth;
 
 use App\Models\Group;
+use App\Models\Permission;
 use App\Models\User as UserModel;
 use App\Models\Route as RouteModel;
 
@@ -41,7 +42,11 @@ class CheckUser
                 $routeDetail = RouteModel::getRouteByName($routeName);
                 if($routeDetail) {
                     if(!UserModel::isAdminUser()) {
-                        abort(403,'Tài khoản không có quyền truy cập');
+                        $permission = new Permission();
+                        $check = $permission->checkPermissionByRouteId($routeDetail->id);
+                        if(!$check) {
+                            abort(403,'Tài khoản không có quyền truy cập');
+                        }
                     }
                     elseif($routeDetail->super_admin == 1) {
                         abort(403,'Tài khoản không có quyền truy cập');

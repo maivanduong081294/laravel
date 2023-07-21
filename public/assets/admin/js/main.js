@@ -1,6 +1,7 @@
 let ajaxUrl = '';
 let ajaxToken = '';
 let ajaxUpdateUrl = '';
+let ajaxInsertUrl = '';
 let ajaxDeleteUrl = '';
 function handleScreen() {
     let screen = $(this).width();
@@ -21,8 +22,8 @@ $(document).ready(function() {
         handleScreen();
     });
     $('.select2').each(function() {
-        var $this = $(this);
-        var attributes = {};
+        let $this = $(this);
+        let attributes = {};
         if($this.hasClass('multiple')) {
             attributes.multiple = true;
         }
@@ -43,8 +44,12 @@ $(document).ready(function() {
             popper.addClass('show-popper');
         }
     });
+    $(document).on('click','.popper-fixed-close',function(e) {
+        e.preventDefault();
+        $('.popper').removeClass('show-popper');
+    });
     $(document).on("click", function(event){
-        var a = $(event.target).parents(".popper-button");
+        let a = $(event.target).parents(".popper-button");
         if (!$(event.target).is(".popper,.popper-button") && !$(event.target).parents(".popper-button").length && !$(event.target).parents(".popper").length) {
             $('.popper').removeClass('show-popper');
         }
@@ -262,5 +267,131 @@ $(document).ready(function() {
         e.preventDefault();
         let checked = false;
         $(this).parent('label').siblings('label').find('input').prop('checked',false);
+    });
+    $(document).on('submit','#add-new-item-form',function(e) {
+        e.preventDefault();
+        const $this = $(this);
+        let formData = new FormData($this[0]);
+        formData.append('_token',ajaxToken);
+        if(ajaxInsertUrl) {
+            $this.prop('disabled',true);
+            $.ajax({
+                url: ajaxInsertUrl,
+                type: 'POST',
+                enctype: 'multipart/form-data',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function(data) {
+                    $this.prop('disabled',false);
+                    $this.find(".form-field-error").remove();
+                    alert('Thành công!');
+                    location.reload();
+                },
+                error: function(response, status, error) {
+                    $this.find(".form-field-error").remove();
+                    $this.prop('disabled',false);
+                    if(response.responseJSON.errors) {
+                        Object.keys(response.responseJSON.errors).forEach((key,i) => {
+                            let item = response.responseJSON.errors[key];
+                            let input = $this.find('*[name="'+key+'"]').parent();
+                            $('<span class="form-field-error">'+item[0]+'</span>').insertAfter(input);
+                            
+                        });
+                        alert('Vui lòng kiểm tra lại dữ liệu');
+                    }
+                    else if(response.responseJSON.message) {
+                        alert(response.responseJSON.message);
+                    }
+                    else {
+                        alert('Lỗi! Vui lòng thử lại sau!');
+                    }
+                }
+            });
+        }
+        else {
+            alert('Lỗi! Vui lòng thử lại sau!');
+        }
+    });
+
+    $(document).on('click','.edit-item-ajax',function(e) {
+        e.preventDefault();
+        const $this = $(this);
+        const url = $this.attr('href');
+        if(ajaxDeleteUrl) {
+            $this.prop('disabled',true);
+            $.ajax({
+                url: url,
+                type: 'POST',
+                data: {
+                    _token: ajaxToken,
+                    view: 1,
+                },
+                success: function(data) {
+                    $this.prop('disabled',false);
+                    $('.popper[data-popper="edit-item-ajax"] .popper-fixed-content-body').html(data);
+                    $('.popper[data-popper="edit-item-ajax"]').addClass('show-popper');
+                },
+                error: function(response, status, error) {
+                    $this.prop('disabled',false);
+                    if(response.responseJSON.message) {
+                        alert(response.responseJSON.message);
+                    }
+                    else {
+                        alert('Lỗi! Vui lòng thử lại sau!');
+                    }
+                }
+            });
+        }
+        else {
+            alert('Lỗi! Vui lòng thử lại sau!');
+        }
+    });
+
+    $(document).on('submit','#edit-item-ajax-form',function(e) {
+        e.preventDefault();
+        const $this = $(this);
+        let formData = new FormData($this[0]);
+        formData.append('_token',ajaxToken);
+        const url = $this.attr('action');
+        if(url) {
+            $this.prop('disabled',true);
+            $.ajax({
+                url: url,
+                type: 'POST',
+                enctype: 'multipart/form-data',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function(data) {
+                    $this.prop('disabled',false);
+                    $this.find(".form-field-error").remove();
+                    alert('Thành công!');
+                    location.reload();
+                },
+                error: function(response, status, error) {
+                    $this.find(".form-field-error").remove();
+                    $this.prop('disabled',false);
+                    if(response.responseJSON.errors) {
+                        Object.keys(response.responseJSON.errors).forEach((key,i) => {
+                            let item = response.responseJSON.errors[key];
+                            let input = $this.find('*[name="'+key+'"]').parent();
+                            $('<span class="form-field-error">'+item[0]+'</span>').insertAfter(input);
+                            
+                        });
+                        alert('Vui lòng kiểm tra lại dữ liệu');
+                    }
+                    else if(response.responseJSON.message) {
+                        alert(response.responseJSON.message);
+                    }
+                    else {
+                        alert('Lỗi! Vui lòng thử lại sau!');
+                    }
+                }
+            });
+        }
+        else {
+            alert('Lỗi! Vui lòng thử lại sau!');
+        }
     });
 });

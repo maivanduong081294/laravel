@@ -198,53 +198,9 @@ class PermissionController extends Controller
     }
 
     public function menu() {
-        $user = Auth::user();
-        $menu = [];
-
-        $beforeMenu = [
-            [
-                'name' => 'Bảng điều khiển',
-                'link' => '/admin',
-                'icon' => '<i class="fa-solid fa-house"></i>'
-            ],
-        ];
-    
-        $afterMenu = [];
-        if(User::isAdminUser()) {
-            $afterMenu[] = [
-                'name' => 'Phân quyền',
-                'link' => '/admin/permissions',
-                'icon' => '<i class="fa-solid fa-arrows-to-eye"></i>',
-                'children' => [
-                    [
-                        'name' => 'Danh sách',
-                        'link' => '/admin/permissions',
-                    ],
-                    [
-                        'name' => 'Thêm mới',
-                        'link' => '/admin/permissions/add',
-                    ]
-                ]
-            ];
-        }
-        if(User::isRootUser()) {
-            $afterMenu[] = [
-                'name' => 'Định tuyến',
-                'link' => '/admin/routes',
-                'icon' => '<i class="fa-solid fa-route"></i>',
-                'children' => [
-                    [
-                        'name' => 'Danh sách',
-                        'link' => '/admin/routes',
-                    ],
-                    [
-                        'name' => 'Thêm mới',
-                        'link' => '/admin/routes/add',
-                    ]
-                ]
-            ];
-        }
-        return array_merge($beforeMenu,$menu,$afterMenu);
+        $model = new Permission();
+        $menu = (array) $model->showMenu();
+        return $menu;
     }
 
     public function delete(Request $request) {

@@ -28,7 +28,7 @@ class UploadController extends Controller
         return $this->view('index');
     }
 
-    public function upload(Request $request) {
+    public function add(Request $request) {
 
         $validator = $this->validator($request);
         if($validator->fails()) {

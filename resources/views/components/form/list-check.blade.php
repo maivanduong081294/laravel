@@ -5,6 +5,7 @@
     </div>
     @endif
     <div class="form-field-body">
+        @if (!empty($values))
         <div class="form-check-list">
             @if ($all)
             <label class="select-all" for="{{$name.'-all'}}">
@@ -28,6 +29,7 @@
                 @endphp
             @endforeach
         </div>
+        @endif
         @error($name)
             <span class="form-field-error">{{$message}}</span>
         @enderror

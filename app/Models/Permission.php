@@ -10,6 +10,7 @@ class Permission extends BaseModel
 
     protected $fillable = [
         "name",
+        "name_has_children",
         "icon",
         "route_id",
         "group_ids",
@@ -50,6 +51,38 @@ class Permission extends BaseModel
         return $value;
     }
 
+    public function checkPermissionByRouteId($route_id) {
+        $user = User::getCurrentUser();
+        $user_id = $user->id;
+        $keyCache = __FUNCTION__.'-'.$route_id.'-'.$user_id;
+        $value = self::getCache($keyCache);
+        if(!self::hasCache($keyCache)) {
+            $links = (array) self::getRouteLinks();
+            $where = [
+                ['status',1],
+                ['route_id',$route_id]
+            ];
+            $sql = "FIND_IN_SET(?, user_ids)";
+            $sqlData = [$user_id];
+
+            $sql.= " OR FIND_IN_SET(?, group_ids)";
+            $sqlData[] = $user->group_id;
+            $sql = "({$sql})";
+            $where[] = [
+                'raw' => [$sql, $sqlData],
+            ];
+            $results = self::getDetail($where);
+            if($results) {
+                $value = true;
+            }
+            else {
+                $value = false;
+            }
+            self::setCache($keyCache,$value);
+        }
+        return $value;
+    }
+
     public function getSelectedRouteIds($route_id=null) {
         $keyCache = __FUNCTION__.json_encode($route_id);
         $value = self::getCache($keyCache);
@@ -78,5 +111,161 @@ class Permission extends BaseModel
     public function filterData($data) {
         $data = parent::filterData($data);
         return $data;
+    }
+
+    private function getRouteIds($id=0,$route_ids=[]) {
+        $keyCache = __FUNCTION__.'-'.$id.'-'.implode(',',$route_ids);
+        $value = self::getCache($keyCache);
+        if(!self::hasCache($keyCache)) {
+            $where = [
+                ['status',1],
+                ['parent_id',$id],
+                ['hidden',0]
+            ];
+            $results = self::getAllList($where);
+            if($results) {
+                foreach($results as $item) {
+                    $route_ids[] = $item->route_id;
+                    $route_ids = self::getRouteIds($item->id,$route_ids);
+                }
+            }
+            $value = $route_ids;
+            self::setCache($keyCache,$value);
+        }
+        return $value;
+    }
+
+    private function getRouteLinks() {
+        $keyCache = __FUNCTION__;
+        $value = self::getCache($keyCache);
+        if(!self::hasCache($keyCache)) {
+            $route_ids = self::getRouteIds();
+            if($route_ids) {
+                $route = new Route();
+                $results = $route->getListByIds($route_ids);
+                if($results) {
+                    $links = [];
+                    foreach($results as $item) {
+                        $links[$item->id] = getLinkByRouteName($item->name);
+                    }
+                    //$links = json_decode(json_encode($links));
+                }
+                $value = $links;
+            }
+            else {
+                $value = [];
+            }
+            self::setCache($keyCache,$value);
+        }
+        return $value;
+    }
+
+    public function getMenu($id=0) {
+        $user = User::getCurrentUser();
+        $user_id = $user->id;
+        $keyCache = __FUNCTION__.'-'.$id.'-'.$user_id;
+        $value = self::getCache($keyCache);
+        if(!self::hasCache($keyCache)) {
+            $links = (array) self::getRouteLinks();
+            $where = [
+                ['hidden',0],
+                ['status',1],
+                ['parent_id',$id]
+            ];
+            $sql = "FIND_IN_SET(?, user_ids)";
+            $sqlData = [$user_id];
+
+            $sql.= " OR FIND_IN_SET(?, group_ids)";
+            $sqlData[] = $user->group_id;
+            $sql = "({$sql})";
+            $where[] = [
+                'raw' => [$sql, $sqlData],
+            ];
+            $results = self::getAllList($where);
+            $results = json_decode(json_encode($results));
+            if($results) {
+                $data = [];
+                foreach($results as $item) {
+                    $route_id = $item->route_id."";
+                    $children = self::getMenu($item->id);
+                    $link = $links[$route_id];
+                    $itemData = [
+                        'name' => $item->name,
+                        'icon' => trim($item->icon)?'<i class="'.$item->icon.'"></i>':"",
+                        'link' => $link,
+                    ];
+                    if($children) {
+                        $child = $itemData;
+                        $child['name'] = $item->name_has_children?$item->name_has_children:$item->name;
+                        $children = array_merge([$child],$children);
+                    }
+                    if($children) {
+                        $itemData['children'] = $children;
+                    }
+                    if($link) {
+                        $data[] = $itemData;
+                    }
+                }
+                $value = $data;
+            }
+            self::setCache($keyCache,$value);
+        }
+        return $value;
+    }
+
+    public function showMenu() {
+        $keyCache = __FUNCTION__;
+        $value = self::getCache($keyCache);
+        if(!self::hasCache($keyCache)) {
+            $menu = self::getMenu();
+            $menu = $menu?$menu:[];
+            $beforeMenu = [
+                [
+                    'name' => 'Bảng điều khiển',
+                    'link' => '/admin',
+                    'icon' => '<i class="fa-solid fa-house"></i>'
+                ],
+            ];
+        
+            $afterMenu = [];
+            if(User::isAdminUser()) {
+                $afterMenu[] = [
+                    'name' => 'Phân quyền',
+                    'link' => '/admin/permissions',
+                    'icon' => '<i class="fa-solid fa-arrows-to-eye"></i>',
+                    'children' => [
+                        [
+                            'name' => 'Danh sách',
+                            'link' => '/admin/permissions',
+                        ],
+                        [
+                            'name' => 'Thêm mới',
+                            'link' => '/admin/permissions/add',
+                        ]
+                    ]
+                ];
+            }
+            if(User::isRootUser()) {
+                $afterMenu[] = [
+                    'name' => 'Định tuyến',
+                    'link' => '/admin/routes',
+                    'icon' => '<i class="fa-solid fa-route"></i>',
+                    'children' => [
+                        [
+                            'name' => 'Danh sách',
+                            'link' => '/admin/routes',
+                        ],
+                        [
+                            'name' => 'Thêm mới',
+                            'link' => '/admin/routes/add',
+                        ]
+                    ]
+                ];
+            }
+            $value = array_merge($beforeMenu,$menu,$afterMenu);
+            $value = json_decode(json_encode($value));
+            self::setCache($keyCache,$value);
+        }
+        return $value;
     }
 }

@@ -12,7 +12,7 @@ class Button extends Component
      * @return void
      */
     public $content,$attrs,$comp,$leftIcon,$rightIcon;
-    public function __construct($content,$onclick="",$class="",$id="",$href="",$target="",$type="",$leftIcon="",$rightIcon="")
+    public function __construct($content,$onclick="",$class="",$id="",$href="",$target="",$type="",$leftIcon="",$rightIcon="",$dataPopper='')
     {
         //
         $attributes = [
@@ -21,7 +21,8 @@ class Button extends Component
             'href' => $href,
             'onclick' => $onclick,
             'target' => $target,
-            'type'=>$type
+            'type'=>$type,
+            'data-popper'=>$dataPopper,
         ];
         
         if(trim($href)) {

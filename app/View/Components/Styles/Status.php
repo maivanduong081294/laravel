@@ -38,6 +38,17 @@ class Status extends Component
                         $type = 'success';
                 }
             }
+            elseif($name == 'limit') {
+                switch ($value) {
+                    case 1: 
+                        $message = 'Đã tới giới hạn';
+                        $type = 'danger';
+                        break;
+                    default:
+                        $message = 'Chưa tới giới hạn';
+                        $type = 'success';
+                }
+            }
         }
 
         $types = [

@@ -19,7 +19,7 @@
 @endsection
 
 @section('content')
-<form action="" method="POST" enctype="multipart/form-data">
+<form action="{{route('admin.upload.add')}}" method="POST" enctype="multipart/form-data">
     @csrf
     <div class="row">
 

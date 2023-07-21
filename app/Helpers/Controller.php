@@ -7,6 +7,7 @@ function listAdminController($name = false) {
         'Users' => \App\Http\Controllers\Admin\UserController::class,
         'Routes' => \App\Http\Controllers\Admin\RouteController::class,
         'Upload' => \App\Http\Controllers\Admin\UploadController::class,
+        'TinyPNG' => \App\Http\Controllers\Admin\TinyPNGController::class,
     ];
     if($name) {
         return array_keys($controllers);

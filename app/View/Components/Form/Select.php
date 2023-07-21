@@ -55,10 +55,12 @@ class Select extends Component
         $values = json_decode(htmlspecialchars_decode($values));
         if($disabled) {
             $disabled = json_decode(htmlspecialchars_decode($disabled));
+            $disabled = empty($disabled)?[]:$disabled;
         }
         else {
             $disabled = [];
         }
+
         $this->label = $label;
         $this->disabled = $disabled;
         $this->id = $id;

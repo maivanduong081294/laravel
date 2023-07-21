@@ -35,6 +35,26 @@ class RouteSeeder extends Seeder
             'controller' => 'Permissions',
             'initChildren' => 1,
             'function' => 'index',
+            'super_admin' => 1,
+            'method' => 'GET',
+            'hidden' => 1,
+        ];
+
+        $data['TinyPNG'] = [
+            'title' => 'Tiny PNG API',
+            'uri' => '/tinypng',
+            'controller' => 'TinyPNG',
+            'initChildren' => 1,
+            'function' => 'index',
+            'method' => 'GET',
+        ];
+
+        $data['Upload'] = [
+            'title' => 'Thư viện ảnh',
+            'uri' => '/upload',
+            'controller' => 'Upload',
+            'initChildren' => 1,
+            'function' => 'index',
             'method' => 'GET',
         ];
 
@@ -56,33 +76,38 @@ class RouteSeeder extends Seeder
         $initChildren = [];
         if((!isset($data['parent_id']) || $data['parent_id']==0) && isset($data['initChildren']) && $data['initChildren']> 0) {
             $initChildren = [
-                [
+                'add' => [
                     'title' => 'Thêm '.$data['title'],
                     'uri' => '/add',
                     'function' => 'add',
                     'method' => 'POST,GET',
                 ],
-                [
+                'edit' => [
                     'title' => 'Sửa '.$data['title'],
                     'uri' => '/edit/{id}',
                     'function' => 'edit',
                     'method' => 'POST,GET',
                 ],
-                [
+                'update' => [
                     'title' => 'Cập nhật '.$data['title'],
                     'uri' => '/update',
                     'function' => 'update',
                     'method' => 'POST',
                 ],
-                [
+                'delete' => [
                     'title' => 'Xoá '.$data['title'],
                     'uri' => '/delete',
                     'function' => 'delete',
                     'method' => 'DELETE',
                 ],
             ];
+            if(in_array($controller,['TinyPNG','Upload'])) {
+                $initChildren['add']['method'] = 'POST';
+                $initChildren['edit']['method'] = 'POST';
+            }
         }
         $children = !empty($data['children'])?array_merge($initChildren,$data['children']):$initChildren;
+       
 
         $item = $route->where('uri',$uri)->where('controller',$controller)->where('function',$function)->where('method',$method)->first();
         

@@ -45,7 +45,7 @@
                 <div class="form-group-body">
                     <x-form.select default="Chọn methods" label="Methods" selected="{{json_encode(old('method'))}}" id="method" placeholder="true" multiple="true" name="method[]" keyByValue="1" values="{{json_encode(routeMethods())}}"/>
                     <x-form.select default="Chọn Controller" label="Controller" selected="{{old('controller')}}" id="controller" name="controller" keyByValue="1" values="{{json_encode(listAdminController(true))}}"/>
-                    <x-form.input label="Function" value="{{old('function')}}" id="function" name="function" placeholder="true  "/>
+                    <x-form.input label="Function" value="{{old('function')}}" id="function" name="function" placeholder="true"/>
                     <x-form.input label="Middleware" value="{{old('middleware')}}" id="middleware" name="middleware" placeholder="true"/>
                 </div>
             </div>

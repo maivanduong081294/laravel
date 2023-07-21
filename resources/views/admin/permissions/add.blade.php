@@ -31,6 +31,7 @@
                 </div>
                 <div class="form-group-body">
                     <x-form.input label="Tên phân quyền" value="{{old('name')}}" id="name" name="name" placeholder="true"/>
+                    <x-form.input label="Tên sub menu" value="{{old('name_has_children')}}" id="name_has_children" name="name_has_children" placeholder="true"/>
                     <x-form.input label="Icon" value="{{old('icon')}}" id="icon" name="icon" placeholder="fa-solid fa-access"/>
                     <x-form.select default="Chọn quyền truy cập" label="Quyền truy cập" disabled="{{json_encode($selectedRoutes)}}" selected="{{old('route_id')}}" id="route_id" name="route_id" values="{{json_encode($listRoute)}}"/>
                 </div>

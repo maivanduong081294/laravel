@@ -6,29 +6,25 @@
     <div class="sidebar-wrapper">
         <ul class="menu-list">
             @foreach ($menu as $item)
-            @if (empty($item['hidden']))
-                <li class="menu-item{{!empty($item['children']) ? ' has-children' : ''}}">
-                    <a href="{{$item['link']}}">
-                        <span class="menu-icon">{!!$item['icon']!!}</span>
-                        <span class="menu-text">{{$item['name']}}</span>
+                <li class="menu-item{{!empty($item->children) ? ' has-children' : ''}}">
+                    <a href="{{$item->link}}">
+                        <span class="menu-icon">{!!$item->icon!!}</span>
+                        <span class="menu-text">{{$item->name}}</span>
                     </a>
-                    @if (!empty($item['children']))
+                    @if (!empty($item->children))
                     <ol class="menu-children">
-                        @foreach ($item['children'] as $subitem)
-                            @if (empty($subitem['hidden']))
+                        @foreach ($item->children as $subitem)
                             <li class="menu-child-item">
-                                <a href="{{$subitem['link']}}">
+                                <a href="{{$subitem->link}}">
                                     <span class="menu-text">
-                                        {{$subitem['name']}}
+                                        {{$subitem->name}}
                                     </span>
                                 </a>
                             </li>
-                            @endif
                         @endforeach
                     </ol>
                     @endif
                 </li>
-            @endif
             @endforeach
         </ul>
         <div class="sidebar-footer">

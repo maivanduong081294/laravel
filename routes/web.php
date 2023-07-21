@@ -6,6 +6,7 @@ use App\Http\Controllers\UserController;
 
 use App\Http\Controllers\Admin\GeneralController;
 use App\Http\Controllers\Admin\AjaxController;
+use App\Http\Controllers\Admin\TinyPNGController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes

@@ -135,7 +135,7 @@
                         <td data-title="Trạng thái" class="min-col"><x-styles.status value="{{$item->status}}" name="status" update="{{$item->status?0:1}}"/></td>
                         <td class="text-center">
                             <x-styles.button href="{{route('admin.permissions.edit',$item->id)}}" class="btn-warning" content='<i class="fa-solid fa-pen"></i>'/>
-                            <x-styles.button class="btn-delete-data btn-danger" content='<i class="fa-solid fa-trash"></i>'/>
+                            <x-styles.button class="btn-delete-data btn-danger" data-item-id="{{$item->id}}" content='<i class="fa-solid fa-trash"></i>'/>
                         </td>
                     </tr>
                 @endforeach

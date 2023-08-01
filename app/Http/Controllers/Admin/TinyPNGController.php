@@ -203,7 +203,7 @@ class TinyPNGController extends Controller
                     if($compression < $this->apiLimit) {
                         $fileName = $detail->file_name;
                         $dir = $detail->disk;
-                        $ext = $detail->mime_type;
+                        $ext = $detail->ext;
                         if($detail->resize_type != 'original') {
                             $fileName.= '-'.$detail->resize_type;
                         }

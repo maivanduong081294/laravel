@@ -236,6 +236,16 @@ class BaseModel extends Model
         }
         return false;
     }
+    public function deleteByWhere($where) {
+        $query = self::select();
+        $query = self::setWhere($query,$where);
+        $result = $query->delete();
+        if($result) {
+            self::flushCache();
+            return true;
+        }
+        return false;
+    }
 
     public function deleteByIds(array $ids,Array $where=[]) {
         if(empty($ids)) {

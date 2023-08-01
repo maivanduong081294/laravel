@@ -12,17 +12,23 @@ class Button extends Component
      * @return void
      */
     public $content,$attrs,$comp,$leftIcon,$rightIcon;
-    public function __construct($content,$onclick="",$class="",$id="",$href="",$target="",$type="",$leftIcon="",$rightIcon="",$dataPopper='')
+    public function __construct($content,$onclick="",$class="",$id="",$href="",$target="",$type="",$leftIcon="",$rightIcon="",$dataPopper='',$dataToggle='',$download="")
     {
         //
+        if(trim($dataToggle)) {
+            $class.= " btn-toggle";
+        }
+        $download = ($download!=='false' && trim($download))?$download:'';
         $attributes = [
-            'class' => 'style-btn '.$class,
+            'class' => 'style-btn '.trim($class),
             'id' => $id,
             'href' => $href,
             'onclick' => $onclick,
             'target' => $target,
             'type'=>$type,
             'data-popper'=>$dataPopper,
+            'data-toggle'=>$dataToggle,
+            'download'=>$download,
         ];
         
         if(trim($href)) {
@@ -31,7 +37,7 @@ class Button extends Component
         else {
             $comp = "button";
         }
-
+        
         $this->attrs = setComponentAttributes($attributes);
         $this->content = $content;
         $this->comp = $comp;

@@ -26,7 +26,7 @@ class DatabaseSeeder extends Seeder
                 [
                     'username' => 'superadmin',
                     'password' => Hash::make('123456'),
-                    'fullname' => 'Administrator',
+                    'fullname' => 'Super Administrator',
                     'email' => 'superadmin@gmail.com',
                     'email_verified_at' => date('Y-m-d H:i:s'),
                     'group_id' =>  $admin_group->id,

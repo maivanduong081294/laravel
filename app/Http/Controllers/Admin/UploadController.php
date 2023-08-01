@@ -7,7 +7,7 @@ use Illuminate\Support\Str;
 use App\Http\Controllers\Admin\Controller;
 
 use Validator;
-use Storage;
+use File;
 use Intervention\Image\Facades\Image;
 
 use App\Models\Media;
@@ -23,9 +23,30 @@ class UploadController extends Controller
 
     public $title = 'Thư viện hình ảnh';
 
-    public function index() {
+    public function index(Request $request) {
         $this->heading = 'Thư viện hình ảnh';
-        return $this->view('index');
+
+        $media = new Media();
+
+        $where = [];
+
+        $search = trim($request->search);
+        if($search) {
+            $where[] = [
+                ['file_name','like','%'.$search.'%',],
+                ['name','like','%'.$search.'%',]
+            ];
+        }
+
+        $order = [];
+        $list = $media->getList($where,$order);
+        $perPage = $media->getPerPage();
+
+        $users = (array) $media->getListUser();
+
+        $actions = self::indexPageActions();
+
+        return $this->view('index',compact('list','users','actions','perPage'));
     }
 
     public function add(Request $request) {
@@ -40,6 +61,7 @@ class UploadController extends Controller
         $time = time();
         $fileName = Str::slug($name).'-'.$time;
         $ext = $request->image->extension();
+        $mimeType = $request->file->getClientMimeType();
 
         $dir = 'uploads/'.date('Y').'/'.date('m');
         $imageName = $fileName.'.'.$ext;
@@ -111,9 +133,111 @@ class UploadController extends Controller
             ->with('type','success'); 
     }
 
-    public function convertWebp() {
-        \Tinify\setKey("ZtSzTNCxDtVBNBRrmfyVQrvgWLZTBHny");
-        
+    public function edit(Request $request) {
+        $media = new Media();
+        $user = new User();
+        $detail = $media->getDetailById($request->id);
+        if(!$detail) {
+            abort(404,'Không tìm thấy hình ảnh cần thay đổi');
+        }
+        $author = $user->getDetailById($detail->author_id);
+        $fileName = $detail->file_name;
+        $dir = $detail->disk;
+        $ext = $detail->mime_type;
+        $fileDir = public_path($dir.'/'.$fileName.'.'.$ext);
+        $detail->amount = formatBytes(File::size($fileDir));
+        $detail->mime_type = File::mimeType($fileDir);
+        $detail->ext = $ext;
+
+        $data = getimagesize($fileDir);
+        $width = $data[0];
+        $height = $data[1];
+        $detail->dimension = $width.'x'.$height;
+        if(!$request->view) {
+            $media->updateById($request->id,['name'=>$request->name]);
+            return false;
+        }
+        else {
+            return $this->view('edit',compact('detail','author'));
+        }
+    }
+
+    public function delete(Request $request) {
+        $model = new Media();
+        $mediable = new Mediable();
+        if($request->has('id')) {
+            $detail = $model->find($request->id);
+            if($detail) {
+                $where = [
+                    ['media_id',$detail->id],
+                ];
+                $resizes = $mediable->getAllList($where);
+                $fileName = $detail->file_name;
+                $dir = $detail->disk;
+                $ext = $detail->mime_type;
+                $files = [];
+                if(count($resizes)) {
+                    foreach($resizes as $resize) {
+                        $tempName = $fileName;
+                        if($resize->type != 'original') {
+                            $tempName.= '-'.$resize->type;
+                        }
+                        $files[] = public_path($dir.'/'.$tempName.'.webp');
+                        $files[] = public_path($dir.'/'.$tempName.'.'.$ext);
+                    }
+                }
+                foreach($files as $file) {
+                    if(file_exists($file)){
+                        echo '1';
+                        unlink($file);
+                    }
+                }
+                $mediable->deleteByWhere($where);
+                $mediable->flushCache();
+                $model->deleteById($request->id);
+                $model->flushCache();
+                $request->session()->flash('msg','Xoá thành công');
+                $request->session()->flash('type','success');
+            }
+            else {
+                abort(404,'Phân quyền không tồn tại');
+            }
+        }
+        // elseif($request->has('ids')) {
+        //     $ids = $request->ids;
+        //     $where = [
+        //         [
+        //             'super_admin',
+        //             '!=',
+        //             '1',
+        //         ]
+        //     ];
+        //     $list = $model->getListByIds($ids,$where);
+        //     if(empty($list)) {
+        //         $all = $model->getListByIds($ids);
+        //         if(!empty($all)) { 
+        //             abort(403,'Bạn không thể xoá những phân quyền đã chọn');
+        //         }
+        //         else {
+        //             abort(404,'Phân quyền không tồn tại');
+        //         }
+        //     }
+        //     else {
+        //         $model->deleteByIds($ids,$where);
+        //         $model->flushCache();
+        //         $request->session()->flash('msg','Xoá danh sách thành công');
+        //         $request->session()->flash('type','success');
+        //     }
+        // }
+        else {
+            abort(404);
+        }
+    }
+
+    private function indexPageActions() {
+        return [
+            'delete' => 'Xoá hình ảnh',
+        ];
     }
 
     private function validator($request) {

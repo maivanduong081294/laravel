@@ -1,5 +1,5 @@
 @if ($content)
-    <{{$comp}} {!!$attrs!!}>
+    <{{$comp}} {!!$attrs!!} {{ $attributes }}>
         @if ($leftIcon)
             <span class="left-icon">{!!$leftIcon!!}</span>
         @endif

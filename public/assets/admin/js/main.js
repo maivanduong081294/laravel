@@ -208,37 +208,40 @@ $(document).ready(function() {
             alert('Lỗi! Vui lòng thử lại sau!');
         }
     });
-    $('.btn-delete-data').on('click',function(e) {
-        e.preventDefault();
-        const $this = $(this);
-        const id = $(this).parents('tr').find('input[name="id"]').val();
-        if(ajaxDeleteUrl) {
-            $this.prop('disabled',true);
-            $.ajax({
-                url: ajaxDeleteUrl,
-                type: 'DELETE',
-                data: {
-                    id: id,
-                    _token: ajaxToken,
-                },
-                success: function(data) {
-                    $this.prop('disabled',false);
-                    alert('Thành công!');
-                    location.reload();
-                },
-                error: function(response, status, error) {
-                    $this.prop('disabled',false);
-                    if(response.responseJSON.message) {
-                        alert(response.responseJSON.message);
+    $(document).on('click','.btn-delete-data',function(e) {
+        const confirmResult = confirm('Bạn có chắc chắn muốn xoá dòng này không?');
+        if(confirmResult === true)  {
+            e.preventDefault();
+            const $this = $(this);
+            const id = $(this).data('item-id');
+            if(ajaxDeleteUrl) {
+                $this.prop('disabled',true);
+                $.ajax({
+                    url: ajaxDeleteUrl,
+                    type: 'DELETE',
+                    data: {
+                        id: id,
+                        _token: ajaxToken,
+                    },
+                    success: function(data) {
+                        $this.prop('disabled',false);
+                        alert('Thành công!');
+                        location.reload();
+                    },
+                    error: function(response, status, error) {
+                        $this.prop('disabled',false);
+                        if(response.responseJSON.message) {
+                            alert(response.responseJSON.message);
+                        }
+                        else {
+                            alert('Lỗi! Vui lòng thử lại sau!');
+                        }
                     }
-                    else {
-                        alert('Lỗi! Vui lòng thử lại sau!');
-                    }
-                }
-            });
-        }
-        else {
-            alert('Lỗi! Vui lòng thử lại sau!');
+                });
+            }
+            else {
+                alert('Lỗi! Vui lòng thử lại sau!');
+            }
         }
     });
     $(document).on('click','.form-yes-no-wrapper input.yes-option',function() {
@@ -318,34 +321,29 @@ $(document).ready(function() {
         e.preventDefault();
         const $this = $(this);
         const url = $this.attr('href');
-        if(ajaxDeleteUrl) {
-            $this.prop('disabled',true);
-            $.ajax({
-                url: url,
-                type: 'POST',
-                data: {
-                    _token: ajaxToken,
-                    view: 1,
-                },
-                success: function(data) {
-                    $this.prop('disabled',false);
-                    $('.popper[data-popper="edit-item-ajax"] .popper-fixed-content-body').html(data);
-                    $('.popper[data-popper="edit-item-ajax"]').addClass('show-popper');
-                },
-                error: function(response, status, error) {
-                    $this.prop('disabled',false);
-                    if(response.responseJSON.message) {
-                        alert(response.responseJSON.message);
-                    }
-                    else {
-                        alert('Lỗi! Vui lòng thử lại sau!');
-                    }
+        $this.prop('disabled',true);
+        $.ajax({
+            url: url,
+            type: 'POST',
+            data: {
+                _token: ajaxToken,
+                view: 1,
+            },
+            success: function(data) {
+                $this.prop('disabled',false);
+                $('.popper[data-popper="edit-item-ajax"] .popper-fixed-content-body').html(data);
+                $('.popper[data-popper="edit-item-ajax"]').addClass('show-popper');
+            },
+            error: function(response, status, error) {
+                $this.prop('disabled',false);
+                if(response.responseJSON.message) {
+                    alert(response.responseJSON.message);
                 }
-            });
-        }
-        else {
-            alert('Lỗi! Vui lòng thử lại sau!');
-        }
+                else {
+                    alert('Lỗi! Vui lòng thử lại sau!');
+                }
+            }
+        });
     });
 
     $(document).on('submit','#edit-item-ajax-form',function(e) {
@@ -392,6 +390,15 @@ $(document).ready(function() {
         }
         else {
             alert('Lỗi! Vui lòng thử lại sau!');
+        }
+    });
+
+
+    $(document).on("click",".btn-toggle",function(e) {
+        e.preventDefault();
+        let toggle = $(this).data('toggle');
+        if($("#"+toggle).length > 0) {
+            $("#"+toggle).slideDown();
         }
     });
 });

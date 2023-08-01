@@ -109,7 +109,7 @@
                         <td data-title="Trạng thái" class="min-col"><x-styles.status value="{{$item->status}}" name="status" update="{{$item->status?0:1}}"/></td>
                         <td class="text-center">
                             <x-styles.button href="{{route('admin.tinypng.edit',$item->id)}}" class="btn-warning edit-item-ajax" content='<i class="fa-solid fa-pen"></i>'/>
-                            <x-styles.button class="btn-delete-data btn-danger" content='<i class="fa-solid fa-trash"></i>'/>
+                            <x-styles.button class="btn-delete-data btn-danger" data-item-id="{{$item->id}}" content='<i class="fa-solid fa-trash"></i>'/>
                         </td>
                     </tr>
                 @endforeach
@@ -132,6 +132,14 @@
         @endif
     </div>
 </div>
+@endsection
+
+@section('css')
+<style>
+    .popper-fixed-content {
+        max-width: 400px;
+    }
+</style>
 @endsection
 
 @section('js')

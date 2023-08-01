@@ -191,7 +191,7 @@ class Permission extends BaseModel
                     $link = $links[$route_id];
                     $itemData = [
                         'name' => $item->name,
-                        'icon' => trim($item->icon)?'<i class="'.$item->icon.'"></i>':"",
+                        'icon' => trim($item->icon)?'<i class="'.$item->icon.'"></i>':'<i class="fa-solid fa-gear"></i>',
                         'link' => $link,
                     ];
                     if($children) {
@@ -214,7 +214,9 @@ class Permission extends BaseModel
     }
 
     public function showMenu() {
-        $keyCache = __FUNCTION__;
+        $user = User::getCurrentUser();
+        $user_id = $user->id;
+        $keyCache = __FUNCTION__.'-'.$user_id;
         $value = self::getCache($keyCache);
         if(!self::hasCache($keyCache)) {
             $menu = self::getMenu();

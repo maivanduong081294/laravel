@@ -203,11 +203,12 @@ class TinyPNGController extends Controller
                     if($compression < $this->apiLimit) {
                         $fileName = $detail->file_name;
                         $dir = $detail->disk;
-                        $ext = $detail->ext;
+                        $ext = $detail->mime_type;
                         if($detail->resize_type != 'original') {
                             $fileName.= '-'.$detail->resize_type;
                         }
-                        $file_dir = public_path($dir).'/'.$fileName.'.'.$ext;
+                        $file_dir = public_path($dir.'/'.$fileName.'.'.$ext);
+                        echo $file_dir;
                         if(file_exists($file_dir)) {
                             $source = \Tinify\fromFile($file_dir);
                             $converted = $source->convert(array("type" => ["image/webp","image/png"]));
@@ -228,7 +229,7 @@ class TinyPNGController extends Controller
                             }
                         }
                         else {
-                            $msg = 'Không tìm thấy hình ảnh';
+                            $msg = 'Không tìm thấy hình ảnh: '.$file_dir;
                             $mediable->where('id',$detail->resize_id)->update(['webp'=>1,'webp_msg' => $msg]);
                         }
                     }

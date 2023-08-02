@@ -50,24 +50,29 @@ class UploadController extends Controller
     }
 
     public function add(Request $request) {
-
         $validator = $this->validator($request);
-        if($validator->fails()) {
-            return back()->withErrors($validator)->withInput()->with('msg','Tải ảnh lên thất bại');
+
+        if( $validator->fails() ) {
+            $messages = $validator->errors()->getMessages();
+            //dd($messages);
+            foreach($messages as $value) {
+                $message = $value[0];
+                break;
+            }
+            return response()->json(['error'=>$message])->setStatusCode(400);
         }
 
         $type = $request->type?$request->type:'upload';
         $name = $request->name?$request->name:uniqid();
         $time = time();
         $fileName = Str::slug($name).'-'.$time;
-        $ext = $request->image->extension();
-        $mimeType = $request->file->getClientMimeType();
+        $ext = $request->file->extension();
 
         $dir = 'uploads/'.date('Y').'/'.date('m');
         $imageName = $fileName.'.'.$ext;
         $fileDir =  $dir.'/'.$imageName;
 
-        $request->image->move(public_path($dir), $imageName);  
+        $request->file->move(public_path($dir), $imageName);  
 
         if(file_exists($fileDir)) {
             $media = new Media();
@@ -128,9 +133,8 @@ class UploadController extends Controller
         }
         /* Store $imageName name in DATABASE from HERE */
     
-        return back()
-            ->with('msg','Bạn đã tải ảnh lên thành công')
-            ->with('type','success'); 
+        $item = $imageDetail;
+        return $this->view('item',compact('item'));
     }
 
     public function edit(Request $request) {
@@ -163,39 +167,9 @@ class UploadController extends Controller
     }
 
     public function delete(Request $request) {
-        $model = new Media();
-        $mediable = new Mediable();
         if($request->has('id')) {
-            $detail = $model->find($request->id);
-            if($detail) {
-                $where = [
-                    ['media_id',$detail->id],
-                ];
-                $resizes = $mediable->getAllList($where);
-                $fileName = $detail->file_name;
-                $dir = $detail->disk;
-                $ext = $detail->mime_type;
-                $files = [];
-                if(count($resizes)) {
-                    foreach($resizes as $resize) {
-                        $tempName = $fileName;
-                        if($resize->type != 'original') {
-                            $tempName.= '-'.$resize->type;
-                        }
-                        $files[] = public_path($dir.'/'.$tempName.'.webp');
-                        $files[] = public_path($dir.'/'.$tempName.'.'.$ext);
-                    }
-                }
-                foreach($files as $file) {
-                    if(file_exists($file)){
-                        echo '1';
-                        unlink($file);
-                    }
-                }
-                $mediable->deleteByWhere($where);
-                $mediable->flushCache();
-                $model->deleteById($request->id);
-                $model->flushCache();
+            $result = self::deleteByItemId($request->id);
+            if($result) {
                 $request->session()->flash('msg','Xoá thành công');
                 $request->session()->flash('type','success');
             }
@@ -203,32 +177,23 @@ class UploadController extends Controller
                 abort(404,'Phân quyền không tồn tại');
             }
         }
-        // elseif($request->has('ids')) {
-        //     $ids = $request->ids;
-        //     $where = [
-        //         [
-        //             'super_admin',
-        //             '!=',
-        //             '1',
-        //         ]
-        //     ];
-        //     $list = $model->getListByIds($ids,$where);
-        //     if(empty($list)) {
-        //         $all = $model->getListByIds($ids);
-        //         if(!empty($all)) { 
-        //             abort(403,'Bạn không thể xoá những phân quyền đã chọn');
-        //         }
-        //         else {
-        //             abort(404,'Phân quyền không tồn tại');
-        //         }
-        //     }
-        //     else {
-        //         $model->deleteByIds($ids,$where);
-        //         $model->flushCache();
-        //         $request->session()->flash('msg','Xoá danh sách thành công');
-        //         $request->session()->flash('type','success');
-        //     }
-        // }
+        elseif($request->has('ids')) {
+            $ids = $request->ids;
+            $flag = false;
+            foreach($ids as $id) {
+                $result = self::deleteByItemId($id);
+                if(!$flag && $result) {
+                    $flag = $result;
+                }
+            }
+            if($flag) {
+                $request->session()->flash('msg','Xoá danh sách thành công');
+                $request->session()->flash('type','success');
+            }
+            else {
+                $request->session()->flash('msg','Xoá danh sách không thành công');
+            }
+        }
         else {
             abort(404);
         }
@@ -242,15 +207,54 @@ class UploadController extends Controller
 
     private function validator($request) {
         $rules = [
-            'image' => 'required|image|mimes:jpeg,png,jpg,gif,svg,webp|max:2048',
+            'file' => 'required|image|mimes:jpeg,png,jpg,gif,svg,webp|max:1024',
         ];
         $messages = [
-            'image.required' => 'Không thể bỏ trống hình ảnh',
-            'image.image' => 'Hình ảnh không đúng định dạng (JPEG, JPG, PNG, GIF, SVG, WEBP)',
-            'image.max' => 'Hình ảnh không được quá :max KB',
+            'file.required' => 'Không tìm thấy tập tin hình ảnh',
+            'file.image' => 'Hình ảnh không đúng định dạng (JPEG, JPG, PNG, GIF, SVG, WEBP)',
+            'file.max' => 'Hình ảnh không được quá :max KB',
         ];
 
         $validator = Validator::make($request->all(),$rules,$messages);
         return $validator;
+    }
+
+    private function deleteByItemId($itemID) {
+        $model = new Media();
+        $mediable = new Mediable();
+        $detail = $model->find($itemID);
+        if($detail) {
+            $where = [
+                ['media_id',$detail->id],
+            ];
+            $resizes = $mediable->getAllList($where);
+            $fileName = $detail->file_name;
+            $dir = $detail->disk;
+            $ext = $detail->mime_type;
+            $files = [];
+            if(count($resizes)) {
+                foreach($resizes as $resize) {
+                    $tempName = $fileName;
+                    if($resize->type != 'original') {
+                        $tempName.= '-'.$resize->type;
+                    }
+                    $files[] = public_path($dir.'/'.$tempName.'.webp');
+                    $files[] = public_path($dir.'/'.$tempName.'.'.$ext);
+                }
+            }
+            foreach($files as $file) {
+                if(file_exists($file)){
+                    unlink($file);
+                }
+            }
+            $mediable->deleteByWhere($where);
+            $mediable->flushCache();
+            $model->deleteById($detail->id);
+            $model->flushCache();
+            return true;
+        }
+        else {
+            return false;
+        }
     }
 }

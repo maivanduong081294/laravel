@@ -110,7 +110,7 @@
         let r = new Resumable({
             target: {!! json_encode(route('admin.upload.add')) !!},
             query: {_token: ajaxToken},
-            uploadMethod: 'POST',
+            testChunks: false,
             forceChunkSize: true,
             chunkSize: (3 * 1024 * 1024),
         });
@@ -322,7 +322,7 @@
 
 @section('css')
 <style>
-    #drag-box-upload {
+    #drag-box-upload-form {
         margin-bottom: 20px;
     }
     .edit-upload-left {

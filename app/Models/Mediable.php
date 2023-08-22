@@ -49,9 +49,9 @@ class Mediable extends BaseModel
                             $source = asset($dir.'/'.$detail->file_name.'.'.$ext);
                         }
                     }
-                    else {
-
-                    }
+                }
+                else {
+                    $source = asset($dir.'/'.$detail->file_name.'.'.$ext);
                 }
             }
             $value = $source;

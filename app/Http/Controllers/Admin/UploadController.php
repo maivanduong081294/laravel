@@ -86,7 +86,7 @@ class UploadController extends Controller
                 'type' => $type,
             ];
             $imageDetail = $media->create($data);
-            if($imageDetail) {
+            if($imageDetail && !in_array($ext,["svg","gif"])) {
                 $option = new Option();
                 $mediable = new Mediable();
                 $resizes = $option->getAllList([
@@ -153,10 +153,31 @@ class UploadController extends Controller
         $detail->mime_type = File::mimeType($fileDir);
         $detail->ext = $ext;
 
-        $data = getimagesize($fileDir);
-        $width = $data[0];
-        $height = $data[1];
-        $detail->dimension = $width.'x'.$height;
+        
+        if($ext == 'svg') {
+            $svgfile = simplexml_load_file($fileDir);
+            $viewBox = explode(' ', $svgfile['viewBox']);
+            if($viewBox) {
+                $width = $viewBox[2];
+                $height = $viewBox[3];
+            }
+            else {
+                $width = substr($svgfile["width"],0,-2);
+                $height = substr($svgfile["height"],0,-2);
+            }
+            $detail->dimension = $width.'x'.$height;
+        }
+        else {
+            $sizes = getimagesize($fileDir);
+            if($sizes) {
+                $width = $sizes[0];
+                $height = $sizes[1];
+                $detail->dimension = $width.'x'.$height;
+            }
+            else {
+                $detail->dimension = 0;
+            }
+        }
         if(!$request->view) {
             $media->updateById($request->id,['name'=>$request->name]);
             return false;

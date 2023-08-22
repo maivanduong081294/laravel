@@ -36,6 +36,7 @@
 <tr>
     <th class="text-center"><x-styles.checkbox type="checkbox" input-class="check-list-all"/></th>
     <x-styles.th order-by="API" text="API"/>
+    <x-styles.th order-by="count" text="Đã gọi"/>
     <x-styles.th order-by="month_limit" text="Giới hạn"/>
     <x-styles.th order-by="status" text="Trạng thái"/>
     <x-styles.th text=""/>
@@ -105,6 +106,7 @@
                         <td data-title="API">
                             {{$item->api}}
                         </td>
+                        <td data-title="Đã gọi">{{$item->count}} (lần)</td>
                         <td data-title="Giới hạn" class="min-col"><x-styles.status value="{{$limit}}" name="limit" /></td>
                         <td data-title="Trạng thái" class="min-col"><x-styles.status value="{{$item->status}}" name="status" update="{{$item->status?0:1}}"/></td>
                         <td class="text-center">

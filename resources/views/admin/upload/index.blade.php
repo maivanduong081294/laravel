@@ -326,7 +326,17 @@
         margin-bottom: 20px;
     }
     .edit-upload-left {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .edit-upload-left figure {
+        flex: 1 1 100%;
         text-align: center;
+    }
+    .edit-upload-left figure img {
+        box-shadow: inset 0 0 15px rgba(0,0,0,.1), inset 0 0 0 1px rgba(0,0,0,.05);
+        background: #f0f0f1;
     }
     .file-information td:nth-child(1) {
         font-weight: bold;
